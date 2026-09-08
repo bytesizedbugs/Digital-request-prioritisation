@@ -1,3 +1,5 @@
+options(download.file.method = "wininet")
+
 # here --------------------------------------------------------------------
 
 if (!require("here")) {
