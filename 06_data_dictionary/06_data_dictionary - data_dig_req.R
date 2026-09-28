@@ -50,7 +50,7 @@ informant_data_dig_req <- pointblank::create_informant(
 info_columns(
   columns = vars(digital_request_number),
   Items = "This column contains {list_digital_request_number}.",
-  info = "Unique identifier for the digital request."
+  info = "A unique persistent identifier assigned to the digital request, acting as the primary key for tracking records across systems."
 ) |>
   
   info_snippet(
@@ -66,7 +66,7 @@ info_columns(
   info_columns(
     columns = vars(effective_number),
     Items = "This column contains {list_effective_number}.",
-    info = "Effective demand identifier within the source system."
+    info = "The unique business identifier assigned to this demand by the source system of record (SOR). Critical for linking back to original submission records."
   ) |>
   
   info_snippet(
@@ -82,7 +82,7 @@ info_columns(
 info_columns(
   columns = vars(directorate),
   Items = "This column contains {list_directorate}.",
-  info = "Directorate associated with the request."
+  info = "The organizational directorate responsible for submitting or managing this digital request, defining its primary department alignment."
 ) |>
   
   info_snippet(
@@ -98,7 +98,7 @@ info_columns(
   info_columns(
     columns = vars(clinical_board),
     Items = "This column contains {list_clinical_board}.",
-    info = "Clinical board associated with the request."
+    info = "The specific clinical board that reviewed and provided endorsement or guidance on this digital request."
   ) |>
   
   info_snippet(
@@ -114,7 +114,7 @@ info_columns(
 info_columns(
   columns = vars(category),
   Items = "This column contains {list_category}.",
-  info = "High-level categorisation of the request."
+  info = "The high-level strategic category or domain that the digital request falls under (e.g., 'Operational Efficiency', 'Patient Safety')."
 ) |>
   
   info_snippet(
@@ -130,7 +130,7 @@ info_columns(
   info_columns(
     columns = vars(type),
     Items = "This column contains {list_type}.",
-    info = "Demand type recorded in the source system."
+    info = "The defined type or nature of the demand as per the source system's taxonomy (e.g., 'New Capability', 'Process Improvement')."
   ) |>
   
   info_snippet(
@@ -145,8 +145,8 @@ info_columns(
   
   info_columns(
     columns = vars(urgency),
-    Items = "This column contains {list_urgency}.",
-    info = "Urgency assigned to the request."
+    info = "The assessed level of urgency for the request (e.g., 'High', 'Medium', 'Low'), requiring prompt attention or immediate action.",
+    Items = "This column contains {list_urgency}."
   ) |>
   
   info_snippet(
@@ -161,8 +161,8 @@ info_columns(
   
   info_columns(
     columns = vars(impact),
-    Items = "This column contains {list_impact}.",
-    info = "Qualitative assessment of impact."
+    info = "A qualitative measure of the potential benefit or harm associated with the requested change. This assesses operational significance (Impact).",
+    Items = "This column contains {list_impact}."
   ) |>
   
   info_snippet(
@@ -177,8 +177,8 @@ info_columns(
   
   info_columns(
     columns = vars(risk_level),
-    Items = "This column contains {list_risk_level}.",
-    info = "Overall qualitative risk level."
+    info = "A standardized, qualitative rating assigned to the overall risk associated with implementing or not implementing this digital request (e.g., 'Low', 'Medium', 'High').",
+    Items = "This column contains {list_risk_level}."
   ) |>
   
   info_snippet(
@@ -193,8 +193,8 @@ info_columns(
   
   info_columns(
     columns = vars(trust_strategy),
-    Items = "This column contains {list_trust_strategy}.",
-    info = "Trust strategic objective supported by the request."
+    info = "The strategic objective or pillar that the successful implementation of this request is intended to support (e.g., 'Patient Centricity', 'System Resilience').",
+    Items = "This column contains {list_trust_strategy}."
   ) |>
   
   info_snippet(
@@ -209,8 +209,8 @@ info_columns(
   
   info_columns(
     columns = vars(funding_availability),
-    Items = "This column contains {list_funding_availability}.",
-    info = "Funding status recorded for the request."
+    info = "The specific funding status assigned to the project (e.g., 'Fully Funded', 'Seed Funding Identified'). Confirms financial viability at various stages.",
+    Items = "This column contains {list_funding_availability}."
   ) |>
   
   info_snippet(
@@ -225,8 +225,8 @@ info_columns(
   
 info_columns(
   columns = vars(funding_sourced),
-  Items = "This column contains {list_funding_sourced}.",
-  info = "Indicates whether funding has been identified or secured."
+  info = "A boolean or enumerated field indicating whether funding sources have been successfully identified and secured for the project scope.",
+  Items = "This column contains {list_funding_sourced}."
 ) |>
   
   info_snippet(
@@ -241,8 +241,8 @@ info_columns(
   
   info_columns(
     columns = vars(impact_analysis_required),
-    Items = "This column contains {list_impact_analysis_required}.",
-    info = "Indicates whether a formal impact analysis is required."
+    info = "A flag indicating the necessity for a formal, dedicated impact analysis (e.g., clinical/operational risk assessment) before proceeding with development or implementation.",
+    Items = "This column contains {list_impact_analysis_required}."
   ) |>
   
   info_snippet(
@@ -257,8 +257,8 @@ info_columns(
   
 info_columns(
   columns = vars(board_priority_rank),
-  Items = "Numeric values.",
-  info = "Priority ranking assigned by the Clinical Board."
+  info = "The priority ranking determined and formalized by the Clinical Board, guiding the sequence of resource allocation for development (e.g., 1-Critical, 5-Low).",
+  Items = "Numeric values."
 ) |>
 
   info_snippet(
@@ -273,8 +273,8 @@ info_columns(
   
   info_columns(
     columns = vars(impact_value),
-    Items = "Numeric values.",
-    info = "Numeric impact score."
+    info = "The standardized numeric score representing the measured impact of the digital request on operations or patient care (higher number = higher perceived value/impact).",
+    Items = "Numeric values."
   ) |>
 
   info_snippet(
@@ -289,8 +289,8 @@ info_columns(
   
   info_columns(
     columns = vars(risk_score),
-    Items = "Numeric values.",
-    info = "Numeric risk score."
+    info = "The standardized numeric score representing the calculated or inherent risk level of the proposed solution (higher number = higher intrinsic risk).",
+    Items = "Numeric values."
   ) |>
   
   info_snippet(
@@ -305,8 +305,8 @@ info_columns(
   
   info_columns(
     columns = vars(updates),
-    Items = "Numeric values.",
-    info = "Count of recorded updates."
+    info = "A count detailing the total number of significant updates or review cycles documented for this request's lifecycle. Acts as a measure of maturity/engagement.",
+    Items = "Numeric values."
   ) |>
   
   info_snippet(
@@ -320,10 +320,10 @@ info_columns(
   ) |>
   
 info_columns(
-  columns = vars(opened),
-  Items = "Date-time values.",
-  info = "Date and time the request was opened."
-) |>
+    columns = vars(opened),
+    info = "The official date and time when the digital request was formally initiated or submitted into the prioritization system record. Key start metric.",
+    Items = "Date-time values."
+  ) |>
   
   info_snippet(
     snippet_name = "list_opened",
@@ -337,8 +337,8 @@ info_columns(
   
   info_columns(
     columns = vars(created),
-    Items = "Date-time values.",
-    info = "Date and time the request record was created."
+    info = "The date and time when the underlying digital request record was first created in the tracking system (System creation timestamp).",
+    Items = "Date-time values."
   ) |>
   
   info_snippet(
@@ -354,7 +354,7 @@ info_columns(
   info_columns(
     columns = vars(closed),
     Items = "Date-time values.",
-    info = "Date and time the request was closed."
+    info = "The date and time on which the digital request status transitioned to 'Closed', marking its formal completion or archival in the system."
   ) |>
   
   info_snippet(
@@ -370,175 +370,175 @@ info_columns(
   info_columns(
     columns = vars(project_title),
     Items = "Free-text field.",
-    info = "Title of the digital request."
+    info = "The finalized, user-facing title summarizing the core need or capability addressed by the digital request."
   ) |>
   
   info_columns(
     columns = vars(background),
     Items = "Free-text field.",
-    info = "Background and context supporting the request."
+    info = "Detailed narrative context providing the background and justification for why this digital request is necessary, detailing current system gaps or processes needing improvement."
   ) |>
   
   info_columns(
     columns = vars(benefits),
     Items = "Free-text field.",
-    info = "Expected benefits of the proposed work."
+    info = "A detailed description of the tangible or intangible benefits (e.g., time saved, revenue gained, safety improved) expected once the digital request is successfully implemented and operationalized."
   ) |>
   
   info_columns(
     columns = vars(objectives),
     Items = "Free-text field.",
-    info = "Objectives the request aims to achieve."
+    info = "The specific, measurable, and high-level objectives (e.g., 'Reduce average turnaround time by 15%', 'Automate X process') that the digital request is designed to achieve and measure success against."
   ) |>
   
   info_columns(
     columns = vars(project_scope),
     Items = "Free-text field.",
-    info = "Description of work included within scope."
+    info = "A clear statement outlining the physical or digital scope of work included in this phase (the 'in-scope' items). Excludes any out-of-scope elements."
   ) |>
   
   info_columns(
     columns = vars(deliverables),
     Items = "Free-text field.",
-    info = "Expected outputs or deliverables."
+    info = "A list of all anticipated and defined tangible outputs or deliverables (e.g., 'API documentation', 'Updated SOPs', 'New reporting dashboard'). These items must be measurable."
   ) |>
   
   info_columns(
     columns = vars(requested_for),
     Items = "Staff names.",
-    info = "Person or service for whom the request was submitted."
+    info = "The individual or service (e.g., 'Radiology Department', 'IT Support') that is the primary recipient of the proposed digital solution or workflow enhancement."
   ) |>
   
   info_columns(
     columns = vars(opened_by),
     Items = "Staff names.",
-    info = "Person who created the request."
+    info = "The name or department of the individual who initiated and authored this digital request record within the system."
   ) |>
   
   info_columns(
     columns = vars(assigned_to),
     Items = "Staff names.",
-    info = "Person currently assigned responsibility for the request."
+    info = "The individual or team currently holding ownership and responsibility for driving the progress of the digital request towards completion."
   ) |>
   
   info_columns(
     columns = vars(demand_manager),
     Items = "Staff names.",
-    info = "Demand manager responsible for the request."
+    info = "The designated Demand Manager responsible for overseeing and guiding the overall progress of this digital request through the prioritization lifecycle."
   ) |>
   
   info_columns(
     columns = vars(closed_by),
     Items = "Staff names.",
-    info = "Person who closed the request."
+    info = "The name or department of the individual/party authorized to formally close and archive the digital request record in the system. Requires formal sign-off."
   ) |> 
   
   info_columns(
     columns = vars(business_justification),
     Items = "Free-text field.",
-    info = "Business rationale supporting the request."
+    info = "A concise explanation of the underlying business necessity or problem that necessitates this digital request, providing justification for resource allocation."
   ) |>
   
   info_columns(
     columns = vars(purpose),
     Items = "Free-text field.",
-    info = "Purpose of the request or project."
+    info = "The overarching problem statement or area of improvement that this digital request aims to solve or address within the organization's processes."
   ) |>
   
   info_columns(
     columns = vars(risk_identification),
     Items = "Free-text field.",
-    info = "Description of identified project risks."
+    info = "A comprehensive identification and description of potential risks (technical, clinical, operational) that could hinder the successful implementation or impact assessment of the request."
   ) |>
   
   info_columns(
     columns = vars(risk_monitoring),
     Items = "Free-text field.",
-    info = "Approach to monitoring identified risks."
+    info = "A detailed outline specifying the systematic methodology and actions planned to continuously monitor and mitigate all identified project risks throughout development and post-launch operations."
   ) |>
   
   info_columns(
     columns = vars(risk_prevention_management),
     Items = "Free-text field.",
-    info = "Risk mitigations and management controls."
+    info = "Specific preventive measures, defined process changes, and required management controls designed to actively reduce the likelihood or severity of the identified project risks."
   ) |> 
   
   info_columns(
     columns = vars(previous_ref),
     Items = "Reference identifiers.",
-    info = "Reference to a predecessor or related request."
+    info = "A reference ID or unique identifier linking this request to a previous, foundational digital project or existing service that informed its current requirements. Crucial for lineage tracking."
   ) |>
   
   info_columns(
     columns = vars(downstream_teams_based_on_initial_analysis),
     Items = "Team names.",
-    info = "Teams identified during initial analysis as likely contributors to delivery."
+    info = "A list of departments, services, and clinical teams that are anticipated to be involved in the design, build, or ongoing usage/maintenance of this digital request solution."
   ) |>
   
   info_columns(
     columns = vars(additional_comments),
     Items = "Free-text field.",
-    info = "Additional comments recorded during request management."
+    info = "General administrative notes maintained by the PMO or stakeholders regarding operational issues, scope changes, or discussion points throughout the request lifecycle, outside of formal fields."
   ) |>
   
   info_columns(
     columns = vars(approval_history),
     Items = "Free-text field.",
-    info = "Audit trail of approval decisions recorded within the source system."
+    info = "A structured record or summary of formal governance approval decisions (e.g., meeting minutes, sign-off documents) that validate the request's progress through review stages."
   ) |>
   
   info_columns(
     columns = vars(assumptions),
     Items = "Free-text field.",
-    info = "Assumptions used when assessing, planning, or delivering the request."
+    info = "A clearly documented list of assumptions (e.g., 'Data quality in X source will remain consistent', 'Stakeholder Y will be available by Q3') that underpin the entire feasibility and planning process for this request."
   ) |>
   
   info_columns(
     columns = vars(clinical_risk_datix_ref),
     Items = "Reference identifiers.",
-    info = "Associated Datix, InPhase, or other clinical risk-management reference numbers."
+    info = "Unique reference numbers from established clinical risk management tools (e.g., Datix, InPhase, mandatory hospital databases) linked to this request's risk profile."
   ) |>
   
   info_columns(
     columns = vars(constraints),
     Items = "Free-text field.",
-    info = "Constraints that may affect delivery of the request."
+    info = "Any known organizational or technical limitations (e.g., 'Must use existing FHIR standard', 'Limited budget') that restrict the design choices or implementation options for this request."
   ) |>
   
   info_columns(
     columns = vars(contact_type),
     Items = "Contact method.",
-    info = "Preferred contact method recorded for the request."
+    info = "The primary and preferred communication method (e.g., 'Email', 'Direct Call', 'Secure Portal Message') for follow-up communications regarding the status of this request."
   ) |>
   
   info_columns(
     columns = vars(demand),
     Items = "Free-text field.",
-    info = "Combined demand title and identifier as recorded in the source system."
+    info = "A consolidated view combining both the common name and the unique identifier used to reference this demand within the primary source operational system (e.g., 'Radiology Demand #2345')."
   ) |>
   
   info_columns(
     columns = vars(escalation),
     Items = "Escalation category.",
-    info = "Escalation status assigned to the request."
+    info = "The current official escalation status of the request (e.g., 'Escalated to Board', 'Under Review by CIO'). Defines its current governance pathway and urgency level."
   ) |>
   
   info_columns(
     columns = vars(exclusions_from_scope),
     Items = "Free-text field.",
-    info = "Activities explicitly excluded from the scope of the request or project."
+    info = "A definitive list of activities, features, or scope items that have been formally agreed upon to be handled by a separate project or process and are therefore explicitly outside the scope of this digital request."
   ) |>
   
   info_columns(
     columns = vars(imported_notes),
     Items = "Free-text field.",
-    info = "Historical notes imported from predecessor systems or records."
+    info = "Important contextual notes or summaries pulled forward into this record from previous systems (e.g., 'Predecessor system noted high dependency on X API'). Helps trace history and prevent assumption creep."
   ) |>
   
   info_columns(
     columns = vars(interface),
     Items = "Free-text field.",
-    info = "Systems interfaces, integrations, or interoperability requirements associated with the request."
+    info = "A description of any required technical integrations, API connections, system interoperability standards (e.g., HL7 FHIR), or system linkages that must be achieved for the request to function correctly."
   ) |>
   
   info_columns(
