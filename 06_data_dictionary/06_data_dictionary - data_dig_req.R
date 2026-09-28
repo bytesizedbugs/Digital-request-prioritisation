@@ -20,8 +20,6 @@ library(pointblank)
 # Prerequisite R scripts --------------------------------------------------
 
 # Ensure data_dig_req exists in the environment.
-# If not already loaded, uncomment and run the daisychain script:
-# source("./01_src/03_wrangle/03_wrangle - daisychain.R")
 
 # Create informant --------------------------------------------------------
 
@@ -583,3 +581,4 @@ yaml_write(
 # View in browser (optional) ----------------------------------------------
 
 informant_data_dig_req
+
