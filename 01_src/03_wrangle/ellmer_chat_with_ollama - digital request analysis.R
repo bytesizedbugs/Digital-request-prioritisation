@@ -42,7 +42,10 @@ chat <- chat_ollama(
   api_headers = character()
 )
 
+# source C:/Users/Weiandd2.NUTH/Documents/Digital-request-prioritisation/06_data_dictionary/06_data_dictionary - data_dig_req.R
+
 chat_output <- chat$chat(btw(
+  informant_data_dig_req,
   data_dig_req |> head(1) |> skim(),
   data_dig_req |> head(1),
   "Help me analyse this digital request record and generate structured metadata "
