@@ -27,19 +27,21 @@ library(renv)
 
 packages_to_download <- c(
   "dotenv", # for reading ".env" file
-  "cleaner", #to help analyse organism data created using AMR package
+  "cleaner", #to help analyse data
   "bookdown", # required to set knitr options
   "here", # for finding files
   "shiny", # for viewing rendered quarto reports (?)
   "quarto", # for quarto report rendering scripts
   "flextable", # for creating pretty (non-interactive) tables
-  "knitr",
+  "knitr", # for creating pretty (non-interactive) tables
   "skimr", # Compact and Flexible Summaries of Data
-  "tidyverse",
+  "tidyverse", # for data wrangling and visualisation
   "readr", #to read csv files
   "readxl", #to read excel files
+  "btw", # for creating tables with summary statistics
   "janitor", # clean_names function
-  "beepr"
+  "beepr", # for audio notification when code finishes running
+  "pointblank" # for data validation and testing
 )
 
 # check packages already installed vs. listed for install -----------------
