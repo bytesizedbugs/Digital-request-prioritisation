@@ -82,7 +82,7 @@ info_columns(
 info_columns(
   columns = vars(directorate),
   Items = "This column contains {list_directorate}.",
-  info = "The organizational directorate responsible for submitting or managing this digital request, defining its primary department alignment."
+  info = "The organisational directorate responsible for submitting or managing this digital request, defining its primary department alignment."
 ) |>
   
   info_snippet(
@@ -177,7 +177,7 @@ info_columns(
   
   info_columns(
     columns = vars(risk_level),
-    info = "A standardized, qualitative rating assigned to the overall risk associated with implementing or not implementing this digital request (e.g., 'Low', 'Medium', 'High').",
+    info = "A standardised, qualitative rating assigned to the overall risk associated with implementing or not implementing this digital request (e.g., 'Low', 'Medium', 'High').",
     Items = "This column contains {list_risk_level}."
   ) |>
   
@@ -257,7 +257,7 @@ info_columns(
   
 info_columns(
   columns = vars(board_priority_rank),
-  info = "The priority ranking determined and formalized by the Clinical Board, guiding the sequence of resource allocation for development (e.g., 1-Critical, 5-Low).",
+  info = "The priority ranking determined and formalised by the Clinical Board, guiding the sequence of resource allocation for development (e.g., 1-Critical, 5-Low).",
   Items = "Numeric values."
 ) |>
 
@@ -273,7 +273,7 @@ info_columns(
   
   info_columns(
     columns = vars(impact_value),
-    info = "The standardized numeric score representing the measured impact of the digital request on operations or patient care (higher number = higher perceived value/impact).",
+    info = "The standardised numeric score representing the measured impact of the digital request on operations or patient care (higher number = higher perceived value/impact).",
     Items = "Numeric values."
   ) |>
 
@@ -289,7 +289,7 @@ info_columns(
   
   info_columns(
     columns = vars(risk_score),
-    info = "The standardized numeric score representing the calculated or inherent risk level of the proposed solution (higher number = higher intrinsic risk).",
+    info = "The standardised numeric score representing the calculated or inherent risk level of the proposed solution (higher number = higher intrinsic risk).",
     Items = "Numeric values."
   ) |>
   
@@ -321,7 +321,7 @@ info_columns(
   
 info_columns(
     columns = vars(opened),
-    info = "The official date and time when the digital request was formally initiated or submitted into the prioritization system record. Key start metric.",
+    info = "The official date and time when the digital request was formally initiated or submitted into the prioritisation system record. Key start metric.",
     Items = "Date-time values."
   ) |>
   
@@ -370,7 +370,7 @@ info_columns(
   info_columns(
     columns = vars(project_title),
     Items = "Free-text field.",
-    info = "The finalized, user-facing title summarizing the core need or capability addressed by the digital request."
+    info = "The finalised, user-facing title summarising the core need or capability addressed by the digital request."
   ) |>
   
   info_columns(
@@ -382,7 +382,7 @@ info_columns(
   info_columns(
     columns = vars(benefits),
     Items = "Free-text field.",
-    info = "A detailed description of the tangible or intangible benefits (e.g., time saved, revenue gained, safety improved) expected once the digital request is successfully implemented and operationalized."
+    info = "A detailed description of the tangible or intangible benefits (e.g., time saved, revenue gained, safety improved) expected once the digital request is successfully implemented and operationalised."
   ) |>
   
   info_columns(
@@ -424,13 +424,13 @@ info_columns(
   info_columns(
     columns = vars(demand_manager),
     Items = "Staff names.",
-    info = "The designated Demand Manager responsible for overseeing and guiding the overall progress of this digital request through the prioritization lifecycle."
+    info = "The designated Demand Manager responsible for overseeing and guiding the overall progress of this digital request through the prioritisation lifecycle."
   ) |>
   
   info_columns(
     columns = vars(closed_by),
     Items = "Staff names.",
-    info = "The name or department of the individual/party authorized to formally close and archive the digital request record in the system. Requires formal sign-off."
+    info = "The name or department of the individual/party authorised to formally close and archive the digital request record in the system. Requires formal sign-off."
   ) |> 
   
   info_columns(
@@ -442,7 +442,7 @@ info_columns(
   info_columns(
     columns = vars(purpose),
     Items = "Free-text field.",
-    info = "The overarching problem statement or area of improvement that this digital request aims to solve or address within the organization's processes."
+    info = "The overarching problem statement or area of improvement that this digital request aims to solve or address within the organisation's processes."
   ) |>
   
   info_columns(
@@ -502,7 +502,7 @@ info_columns(
   info_columns(
     columns = vars(constraints),
     Items = "Free-text field.",
-    info = "Any known organizational or technical limitations (e.g., 'Must use existing FHIR standard', 'Limited budget') that restrict the design choices or implementation options for this request."
+    info = "Any known organisational or technical limitations (e.g., 'Must use existing FHIR standard', 'Limited budget') that restrict the design choices or implementation options for this request."
   ) |>
   
   info_columns(
