@@ -41,6 +41,10 @@ packages_to_download <- c(
   "btw", # for creating tables with summary statistics
   "janitor", # clean_names function
   "beepr", # for audio notification when code finishes running
+  "ellmer", # for LLMs
+  "ollamar", # The Ollama R library is the easiest way to integrate R with Ollama, which lets you run language models locally on your own machine
+  "curl", # for downloading files from URLs
+  "reticulate", # for using Python in R
   "pointblank" # for data validation and testing
 )
 
@@ -126,6 +130,28 @@ knitr::opts_chunk$set(
 # theme minimal -----------------------------------------------------------
 
 ggplot2::theme_set(ggplot2::theme_minimal())
+
+
+# ellmer options  -----------------------------------------------------------------
+
+# https://ellmer.tidyverse.org/news/index.html?q=timeout#new-features-0-3-0
+
+# timeout -------------
+
+# The default timeout, controlled by option(ellmer_timeout_s), now applies to the initial connection phase. Together, these changes should make it much more likely for ellmer requests to succeed.
+
+# Timeout -- must be set before initialising the chat object
+options(ellmer_timeout_s = 1800)   # 30 minutes; default is 300 s (5 min)
+# 
+# withr::local_options(ellmer_timeout_s = 1800)  # 30 minutes; default is 300 s (5 min)
+
+# retries -------------
+
+# ellmer now retries requests up to 3 times, controllable with option(ellmer_max_tries), and will retry if the connection fails (rather than just if the request itself returns a transient error).
+
+# options(ellmer_max_tries = 3)
+# 
+# withr::local_options(ellmer_max_tries = 3)
 
 # Update packages (optional) ----------------------------------------------
 
