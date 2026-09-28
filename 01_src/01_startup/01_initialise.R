@@ -26,48 +26,20 @@ library(renv)
 # list packages to download -----------------------------------------------
 
 packages_to_download <- c(
-  "tidymodels", #https://www.tidymodels.org/packages/ The core tidymodels packages work together to enable a wide variety of modeling approaches
   "dotenv", # for reading ".env" file
-  "AMR", #organism ID and susceptibility data wrangling
   "cleaner", #to help analyse organism data created using AMR package
   "bookdown", # required to set knitr options
   "here", # for finding files
-  "tidytext", # for text cleaning tools
   "shiny", # for viewing rendered quarto reports (?)
   "quarto", # for quarto report rendering scripts
   "flextable", # for creating pretty (non-interactive) tables
-  #"reactable", # for creating interactive tables in quarto reports
-  #"plotly", # for creating interactive charts in quarto reports
-  "excel.link", # to read password protected excel files (xl.read.file function)
-  # "dplyr",
-  # "lubridate",
-  # "stringr",
-  # "forcats",
-  # "purrr",
-  "odbc", # for SQL connection to APEX
-  "gt",
   "knitr",
-  "DBI", # for SQL connection to APEX
-  "NHSRplotthedots", # QI work
-  "RSQLite",
   "skimr", # Compact and Flexible Summaries of Data
   "tidyverse",
-  "networkD3", #for sankey diagrams
   "readr", #to read csv files
   "readxl", #to read excel files
   "janitor", # clean_names function
-  "beepr",
-  "bench", # for timing SQL queries
-  "openxlsx",
-  #"waffle", # for e.g. Waffle Chart Showing Survival Rates
-  "ggrepel", # for geom_label_repel function... geom_label_repel draws a rectangle underneath the text, making it easier to read. The text labels repel away from each other and away from the data points.
-  #"trelliscopejs" # for creating interactive dashboards in quarto reports
-  "dlookr", # for creating data diagnosis reports
-  "kknn", # for building k-nearest neighbour models
-  "xfun",
-  "corrplot", # for plotting data from correlation matrices
-  "butcher", # for reducing size of model objects before saving
-  "bundle" # for collecting together all info associated with a model object before saving
+  "beepr"
 )
 
 # check packages already installed vs. listed for install -----------------
