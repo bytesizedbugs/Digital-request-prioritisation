@@ -4,10 +4,10 @@
 # "06_data_dictionary - data_dig_req.R" (for informant_data_dig_req) first.
 # Output: 02_data_output/dig_req_llm_metadata.rds (read by 07_report/digital_request_themes.qmd)
 
-library(ellmer)
-library(jsonlite)
-library(purrr)
-library(dplyr)
+# library(ellmer)
+# library(jsonlite)
+# library(purrr)
+# library(dplyr)
 
 ## Config ----------------
 model_name <- "gemma4"
