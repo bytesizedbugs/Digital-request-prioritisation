@@ -82,7 +82,7 @@ info_columns(
 info_columns(
   columns = vars(directorate),
   Items = "This column contains {list_directorate}.",
-  info = "The organisational directorate responsible for submitting or managing this digital request, defining its primary department alignment."
+  info = "The organisational directorate responsible for submitting this digital request, defining its primary department alignment. A directorate may contain multiple specialties. All directorates form part of one of the eight clinical boards at Newcastle upon Tyne Hospitals NHS Foundation Trust."
 ) |>
   
   info_snippet(
@@ -98,7 +98,7 @@ info_columns(
   info_columns(
     columns = vars(clinical_board),
     Items = "This column contains {list_clinical_board}.",
-    info = "The specific clinical board that reviewed and provided endorsement or guidance on this digital request."
+    info = "The specific clinical board that hosts the directorate that submitted this digital request."
   ) |>
   
   info_snippet(
@@ -257,7 +257,7 @@ info_columns(
   
 info_columns(
   columns = vars(board_priority_rank),
-  info = "The priority ranking determined and formalised by the Clinical Board, guiding the sequence of resource allocation for development (e.g., 1-Critical, 5-Low).",
+  info = "The priority ranking determined by the clinical board's clinical informatics lead, with 1 being the highest rated digital request, and higher numbers indicating lower priority.",
   Items = "Numeric values."
 ) |>
 
@@ -370,13 +370,13 @@ info_columns(
   info_columns(
     columns = vars(project_title),
     Items = "Free-text field.",
-    info = "The finalised, user-facing title summarising the core need or capability addressed by the digital request."
+    info = "The user-generated title for the digital request. This may not be unique and is often a brief summary of the request's purpose or intended outcome. It may not reflect the full scope of the request. The title is often used in reporting and dashboards to identify the request."
   ) |>
   
   info_columns(
     columns = vars(background),
     Items = "Free-text field.",
-    info = "Detailed narrative context providing the background and justification for why this digital request is necessary, detailing current system gaps or processes needing improvement."
+    info = "Free-text response to the following question: 'What is the context of the project, & why is the work needed? Briefly describe the idea or problem & discuss why this project is relevant & timely. The details will come later. Use this section to highlight briefly how this project came about.' i.e. Detailed free-text narrative context providing the background and justification for why this digital request is necessary, detailing current system gaps or processes needing improvement."
   ) |>
   
   info_columns(
@@ -418,13 +418,13 @@ info_columns(
   info_columns(
     columns = vars(assigned_to),
     Items = "Staff names.",
-    info = "The individual or team currently holding ownership and responsibility for driving the progress of the digital request towards completion."
+    info = "The name of the individual currently holding ownership and responsibility for driving the progress of the digital request towards completion."
   ) |>
   
   info_columns(
     columns = vars(demand_manager),
     Items = "Staff names.",
-    info = "The designated Demand Manager responsible for overseeing and guiding the overall progress of this digital request through the prioritisation lifecycle."
+    info = "The designated information services-based Demand Manager responsible for overseeing and guiding the overall progress of this digital request through the prioritisation lifecycle."
   ) |>
   
   info_columns(
@@ -466,13 +466,13 @@ info_columns(
   info_columns(
     columns = vars(previous_ref),
     Items = "Reference identifiers.",
-    info = "A reference ID or unique identifier linking this request to a previous, foundational digital project or existing service that informed its current requirements. Crucial for lineage tracking."
+    info = "A reference ID or unique identifier linking this request to a previous, legacy digital project or request informed its current requirements."
   ) |>
   
   info_columns(
     columns = vars(downstream_teams_based_on_initial_analysis),
     Items = "Team names.",
-    info = "A list of departments, services, and clinical teams that are anticipated to be involved in the design, build, or ongoing usage/maintenance of this digital request solution."
+    info = "A comma-separated string of departments, services, and/or clinical teams that are anticipated to be involved in the design, build, or ongoing usage/maintenance of this digital request solution."
   ) |>
   
   info_columns(
@@ -484,13 +484,13 @@ info_columns(
   info_columns(
     columns = vars(approval_history),
     Items = "Free-text field.",
-    info = "A structured record or summary of formal governance approval decisions (e.g., meeting minutes, sign-off documents) that validate the request's progress through review stages."
+    info = "The name of the individual who approved the digital request so it progressed to the next stage of the prioritisation process, along with the date and time of approval."
   ) |>
   
   info_columns(
     columns = vars(assumptions),
     Items = "Free-text field.",
-    info = "A clearly documented list of assumptions (e.g., 'Data quality in X source will remain consistent', 'Stakeholder Y will be available by Q3') that underpin the entire feasibility and planning process for this request."
+    info = "Free-text response to the question: 'What assumptions are you making at the start of the project? If necessary, schedule work to confirm these assumptions'. This field is intended to capture any assumptions that may impact the design, implementation, or expected outcomes of the digital request."
   ) |>
   
   info_columns(

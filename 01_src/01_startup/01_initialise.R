@@ -27,6 +27,7 @@ library(renv)
 
 packages_to_download <- c(
   "dotenv", # for reading ".env" file
+  "jsonlite", # for reading/writing JSON files
   "cleaner", #to help analyse data
   "bookdown", # required to set knitr options
   "here", # for finding files
