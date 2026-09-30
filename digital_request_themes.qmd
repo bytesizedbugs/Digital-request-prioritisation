@@ -14,7 +14,7 @@ library(dplyr)
 library(tidyr)
 library(purrr)
 library(knitr)
-res <- readRDS(here::here("02_data_output", "dig_req_llm_metadata.rds"))
+res <- readRDS(here::here("02_data_output", "dig_req_llm_metadata_2.rds"))
 flat <- res |>
   mutate(
     summary = map_chr(metadata_v3, ~ .x$summary %||% NA_character_),

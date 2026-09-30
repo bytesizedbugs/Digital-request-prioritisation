@@ -2,7 +2,12 @@
 # for every row of data_dig_req (issue #5).
 # Prerequisites: run 01_initialise.R, 02_data_import.R and
 # "06_data_dictionary - data_dig_req.R" (for informant_data_dig_req) first.
-# Output: 02_data_output/dig_req_llm_metadata.rds (read by 07_report/digital_request_themes.qmd)
+# Output: 02_data_output/dig_req_llm_metadata_2.rds (read by 07_report/digital_request_themes.qmd)
+
+source(here::here("01_src", "01_startup", "01_initialise.R"))
+source(here::here("01_src", "01_startup", "02_data_import.R"))
+source(here::here("01_src", "03_wrangle", "06_data_dictionary - data_dig_req.R"))
+# source(here::here("01_src", "03_wrangle", "ellmer_chat_with_ollama - digital request analysis.R"))
 
 # library(ellmer)
 # library(jsonlite)
@@ -13,7 +18,7 @@
 model_name <- "gemma4"
 max_json_retries <- 3
 base_url <- Sys.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-output_file <- here::here("02_data_output", "dig_req_llm_metadata.rds")
+output_file <- here::here("02_data_output", "dig_req_llm_metadata_2.rds")
 
 metadata_fields <- c(
   "summary", "key_problem", "requested_outcome", "stakeholders", "business_area",
