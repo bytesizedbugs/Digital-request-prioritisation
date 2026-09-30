@@ -50,7 +50,7 @@ informant_data_dig_req <- pointblank::create_informant(
 info_columns(
   columns = vars(digital_request_number),
   Items = "This column contains {list_digital_request_number}.",
-  info = "A unique persistent identifier assigned to the digital request, acting as the primary key for tracking records across systems."
+  info = "Unique identifier assigned to the digital request record."
 ) |>
   
   info_snippet(
@@ -66,7 +66,7 @@ info_columns(
   info_columns(
     columns = vars(effective_number),
     Items = "This column contains {list_effective_number}.",
-    info = "The unique business identifier assigned to this demand by the source system of record (SOR). Critical for linking back to original submission records."
+    info = "The same as digital_request_number, i.e. Unique identifier assigned to the digital request record."
   ) |>
   
   info_snippet(
@@ -82,7 +82,7 @@ info_columns(
 info_columns(
   columns = vars(directorate),
   Items = "This column contains {list_directorate}.",
-  info = "The organisational directorate responsible for submitting this digital request, defining its primary department alignment. A directorate may contain multiple specialties. All directorates form part of one of the eight clinical boards at Newcastle upon Tyne Hospitals NHS Foundation Trust."
+  info = "The organisational directorate responsible for submitting this digital request, defining its primary department alignment. A directorate may contain multiple specialties. All directorates form part of one of the clinical boards at Newcastle upon Tyne Hospitals NHS Foundation Trust."
 ) |>
   
   info_snippet(
@@ -145,7 +145,7 @@ info_columns(
   
   info_columns(
     columns = vars(urgency),
-    info = "The assessed level of urgency for the request (e.g., 'High', 'Medium', 'Low'), requiring prompt attention or immediate action.",
+    info = "Urgency rating assigned to the request by the user completing the form. i.e. The assessed level of urgency for the request (e.g., 'Critical', 'High', 'Medium', 'Low')",
     Items = "This column contains {list_urgency}."
   ) |>
   
@@ -161,7 +161,7 @@ info_columns(
   
   info_columns(
     columns = vars(impact),
-    info = "A qualitative measure of the potential benefit or harm associated with the requested change. This assesses operational significance (Impact).",
+    info = "Categorical impact rating assigned to the request (e.g. 'Catastrophic', 'High', 'Medium', 'Low', 'Insignificant'). This is a qualitative assessment of the potential effect or significance of the request on operations, patient care, or system performance. ",
     Items = "This column contains {list_impact}."
   ) |>
   
@@ -177,7 +177,7 @@ info_columns(
   
   info_columns(
     columns = vars(risk_level),
-    info = "A standardised, qualitative rating assigned to the overall risk associated with implementing or not implementing this digital request (e.g., 'Low', 'Medium', 'High').",
+    info = "Risk rating assigned to the request.",
     Items = "This column contains {list_risk_level}."
   ) |>
   
@@ -225,7 +225,7 @@ info_columns(
   
 info_columns(
   columns = vars(funding_sourced),
-  info = "A boolean or enumerated field indicating whether funding sources have been successfully identified and secured for the project scope.",
+  info = "Response to the question: 'Have you sourced the necessary funding for this project?'. Indicates whether the necessary funding for the project has been sourced.",
   Items = "This column contains {list_funding_sourced}."
 ) |>
   
@@ -257,7 +257,7 @@ info_columns(
   
 info_columns(
   columns = vars(board_priority_rank),
-  info = "The priority ranking determined by the clinical board's clinical informatics lead, with 1 being the highest rated digital request, and higher numbers indicating lower priority.",
+  info = "Priority rank assigned during the prioritisation process. Lower numbers indicate higher priority (e.g. 1 = highest priority).",
   Items = "Numeric values."
 ) |>
 
@@ -273,7 +273,7 @@ info_columns(
   
   info_columns(
     columns = vars(impact_value),
-    info = "The standardised numeric score representing the measured impact of the digital request on operations or patient care (higher number = higher perceived value/impact).",
+    info = "Numeric impact score associated with the request, with higher numbers meaning greater potential impact (e.g.0 = low impact, 5 = high impact).",
     Items = "Numeric values."
   ) |>
 
@@ -289,7 +289,7 @@ info_columns(
   
   info_columns(
     columns = vars(risk_score),
-    info = "The standardised numeric score representing the calculated or inherent risk level of the proposed solution (higher number = higher intrinsic risk).",
+    info = "Numeric risk score associated with the request (25 = high risk, 0 = low risk).",
     Items = "Numeric values."
   ) |>
   
@@ -305,7 +305,7 @@ info_columns(
   
   info_columns(
     columns = vars(updates),
-    info = "A count detailing the total number of significant updates or review cycles documented for this request's lifecycle. Acts as a measure of maturity/engagement.",
+    info = "Number of updates recorded against the request.",
     Items = "Numeric values."
   ) |>
   
@@ -382,25 +382,25 @@ info_columns(
   info_columns(
     columns = vars(benefits),
     Items = "Free-text field.",
-    info = "A detailed description of the tangible or intangible benefits (e.g., time saved, revenue gained, safety improved) expected once the digital request is successfully implemented and operationalised."
+    info = "Free-text response to the question: 'Why are you carrying out this project, & what benefits do you expect it to deliver? Include information on how these benefits will be measured. What is the scale of the benefits in terms of impact on clinical effectiveness and quality of care provision?'. Describes the expected tangible or intangible benefits, how they will be measured, and their impact on clinical effectiveness and quality of care."
   ) |>
   
   info_columns(
     columns = vars(objectives),
     Items = "Free-text field.",
-    info = "The specific, measurable, and high-level objectives (e.g., 'Reduce average turnaround time by 15%', 'Automate X process') that the digital request is designed to achieve and measure success against."
+    info = "Free-text response to the question: 'What specific outcomes will be achieved, & how will you measure these outcomes? Try to limit the number of objectives for your project – four or five goals are typically enough.'. Captures the specific outcomes the digital request aims to achieve and how success will be measured."
   ) |>
   
   info_columns(
     columns = vars(project_scope),
     Items = "Free-text field.",
-    info = "A clear statement outlining the physical or digital scope of work included in this phase (the 'in-scope' items). Excludes any out-of-scope elements."
+    info = "Free-text response to the question: 'What are the boundaries for this project (for example, type of work, type of client, type of problem, areas covered)?'. Describes the boundaries of the project, i.e. what is in scope."
   ) |>
   
   info_columns(
     columns = vars(deliverables),
     Items = "Free-text field.",
-    info = "A list of all anticipated and defined tangible outputs or deliverables (e.g., 'API documentation', 'Updated SOPs', 'New reporting dashboard'). These items must be measurable."
+    info = "Free-text response to the question: 'What will the project deliver as outputs? Where you can, describe deliverables as tangible items like reports, products, or services. If known, include a date that each deliverable is expected.'. Lists the anticipated outputs of the project and, where known, their expected dates."
   ) |>
   
   info_columns(
@@ -442,25 +442,25 @@ info_columns(
   info_columns(
     columns = vars(purpose),
     Items = "Free-text field.",
-    info = "The overarching problem statement or area of improvement that this digital request aims to solve or address within the organisation's processes."
+    info = "Free-text response to the question: 'Why are you doing this work? Describe the desired result of this project. Is this part of a wider business case? What are the primary clinical drivers for this project? Please elaborate on the underlying motivations and the expected improvements in patient care or operational processes.'. Describes the reason for the work, its desired result, and its clinical drivers."
   ) |>
   
   info_columns(
     columns = vars(risk_identification),
     Items = "Free-text field.",
-    info = "A comprehensive identification and description of potential risks (technical, clinical, operational) that could hinder the successful implementation or impact assessment of the request."
+    info = "Free-text response to the question: 'What are the risks if the project is not done? What specific clinical risks and hazards have been identified in relation to this project? Please provide detailed descriptions of each risk and hazard, including the potential implications for patient safety, clinical outcomes, and operational efficiency.'. Captures identified risks and hazards, including their implications for patient safety, clinical outcomes and operational efficiency."
   ) |>
   
   info_columns(
     columns = vars(risk_monitoring),
     Items = "Free-text field.",
-    info = "A detailed outline specifying the systematic methodology and actions planned to continuously monitor and mitigate all identified project risks throughout development and post-launch operations."
+    info = "Free-text response to the question: 'Where you can't prevent risks, what are your contingency plans for dealing with them? What actions will you take should the risk materialise?'. Captures contingency plans and actions to take if identified risks materialise."
   ) |>
   
   info_columns(
     columns = vars(risk_prevention_management),
     Items = "Free-text field.",
-    info = "Specific preventive measures, defined process changes, and required management controls designed to actively reduce the likelihood or severity of the identified project risks."
+    info = "Free-text response to the question: 'What workarounds are currently in place? What are you currently doing to mitigate the risk?'. Describes current workarounds and mitigation measures for the identified risks."
   ) |> 
   
   info_columns(
@@ -496,37 +496,37 @@ info_columns(
   info_columns(
     columns = vars(clinical_risk_datix_ref),
     Items = "Reference identifiers.",
-    info = "Unique reference numbers from established clinical risk management tools (e.g., Datix, InPhase, mandatory hospital databases) linked to this request's risk profile."
+    info = "Free-text response to the form field: 'Provide Clinical Risk / Datix Ref (if any)'. Reference number(s) of any related clinical risk or Datix record linked to this request."
   ) |>
   
   info_columns(
     columns = vars(constraints),
     Items = "Free-text field.",
-    info = "Any known organisational or technical limitations (e.g., 'Must use existing FHIR standard', 'Limited budget') that restrict the design choices or implementation options for this request."
+    info = "Free-text response to the question: 'What things must you take into consideration that will influence your deliverables & schedule? These are external variables that you cannot control but need to manage.'. Captures external constraints that influence deliverables and schedule."
   ) |>
   
   info_columns(
     columns = vars(contact_type),
     Items = "Contact method.",
-    info = "The primary and preferred communication method (e.g., 'Email', 'Direct Call', 'Secure Portal Message') for follow-up communications regarding the status of this request."
+    info = "Field of uncertain value. It may indicate the preferred method of contact for the requestor or stakeholders (e.g., 'Email', 'Phone', 'In-person')"
   ) |>
   
   info_columns(
     columns = vars(demand),
     Items = "Free-text field.",
-    info = "A consolidated view combining both the common name and the unique identifier used to reference this demand within the primary source operational system (e.g., 'Radiology Demand #2345')."
+    info = "An alternative project title that provides a descriptive name for the request and also includes the unique identifier (digital_request_number)."
   ) |>
   
   info_columns(
     columns = vars(escalation),
     Items = "Escalation category.",
-    info = "The current official escalation status of the request (e.g., 'Escalated to Board', 'Under Review by CIO'). Defines its current governance pathway and urgency level."
+    info = "Field of uncertain value. It may indicate the escalation status or category of the request (e.g., 'Normal')."
   ) |>
   
   info_columns(
     columns = vars(exclusions_from_scope),
     Items = "Free-text field.",
-    info = "A definitive list of activities, features, or scope items that have been formally agreed upon to be handled by a separate project or process and are therefore explicitly outside the scope of this digital request."
+    info = "Free-text response to the question: 'List any areas excluded that you believe stakeholders might assume are included but are not. The more specific you are, the less opportunity there is for misunderstanding at a later stage in the project.'. Lists areas explicitly out of scope."
   ) |>
   
   info_columns(
@@ -538,7 +538,7 @@ info_columns(
   info_columns(
     columns = vars(interface),
     Items = "Free-text field.",
-    info = "A description of any required technical integrations, API connections, system interoperability standards (e.g., HL7 FHIR), or system linkages that must be achieved for the request to function correctly."
+    info = "Free-text response to the question: 'Will this change require an interface with existing systems or software e.g. SystmOne or PAS?'. Describes any required interfaces with existing systems or software."
   ) |>
   
   info_columns(
@@ -550,7 +550,7 @@ info_columns(
   info_columns(
     columns = vars(reporting_resource),
     Items = "Free-text field.",
-    info = "Reporting requirements, reporting processes, or reporting resources associated with the request."
+    info = "Free-text response to the form field 'Reporting / Resource': 'Describe the current & proposed arrangements for: performance & management reporting and financial data flows; mandated national data flows; clinical & operational reporting and data flows - required both internal & external to the Trust'. Captures current and proposed reporting and data flow arrangements."
   ) |>
   
   info_columns(
