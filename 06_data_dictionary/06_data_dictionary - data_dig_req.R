@@ -50,7 +50,7 @@ informant_data_dig_req <- pointblank::create_informant(
 info_columns(
   columns = vars(digital_request_number),
   Items = "This column contains {list_digital_request_number}.",
-  info = "A unique persistent identifier assigned to the digital request, acting as the primary key for tracking records across systems."
+  info = "Unique identifier assigned to the digital request record."
 ) |>
   
   info_snippet(
@@ -66,7 +66,7 @@ info_columns(
   info_columns(
     columns = vars(effective_number),
     Items = "This column contains {list_effective_number}.",
-    info = "The unique business identifier assigned to this demand by the source system of record (SOR). Critical for linking back to original submission records."
+    info = "The same as digital_request_number, i.e. Unique identifier assigned to the digital request record."
   ) |>
   
   info_snippet(
@@ -82,7 +82,7 @@ info_columns(
 info_columns(
   columns = vars(directorate),
   Items = "This column contains {list_directorate}.",
-  info = "The organisational directorate responsible for submitting this digital request, defining its primary department alignment. A directorate may contain multiple specialties. All directorates form part of one of the eight clinical boards at Newcastle upon Tyne Hospitals NHS Foundation Trust."
+  info = "The organisational directorate responsible for submitting this digital request, defining its primary department alignment. A directorate may contain multiple specialties. All directorates form part of one of the clinical boards at Newcastle upon Tyne Hospitals NHS Foundation Trust."
 ) |>
   
   info_snippet(
@@ -145,7 +145,7 @@ info_columns(
   
   info_columns(
     columns = vars(urgency),
-    info = "The assessed level of urgency for the request (e.g., 'High', 'Medium', 'Low'), requiring prompt attention or immediate action.",
+    info = "Urgency rating assigned to the request by the user completing the form. i.e. The assessed level of urgency for the request (e.g., 'Critical', 'High', 'Medium', 'Low')",
     Items = "This column contains {list_urgency}."
   ) |>
   
@@ -161,7 +161,7 @@ info_columns(
   
   info_columns(
     columns = vars(impact),
-    info = "A qualitative measure of the potential benefit or harm associated with the requested change. This assesses operational significance (Impact).",
+    info = "Categorical impact rating assigned to the request (e.g. 'Catastrophic', 'High', 'Medium', 'Low', 'Insignificant'). This is a qualitative assessment of the potential effect or significance of the request on operations, patient care, or system performance. ",
     Items = "This column contains {list_impact}."
   ) |>
   
@@ -177,7 +177,7 @@ info_columns(
   
   info_columns(
     columns = vars(risk_level),
-    info = "A standardised, qualitative rating assigned to the overall risk associated with implementing or not implementing this digital request (e.g., 'Low', 'Medium', 'High').",
+    info = "Risk rating assigned to the request.",
     Items = "This column contains {list_risk_level}."
   ) |>
   
@@ -257,7 +257,7 @@ info_columns(
   
 info_columns(
   columns = vars(board_priority_rank),
-  info = "The priority ranking determined by the clinical board's clinical informatics lead, with 1 being the highest rated digital request, and higher numbers indicating lower priority.",
+  info = "Priority rank assigned during the prioritisation process. Lower numbers indicate higher priority (e.g. 1 = highest priority).",
   Items = "Numeric values."
 ) |>
 
@@ -273,7 +273,7 @@ info_columns(
   
   info_columns(
     columns = vars(impact_value),
-    info = "The standardised numeric score representing the measured impact of the digital request on operations or patient care (higher number = higher perceived value/impact).",
+    info = "Numeric impact score associated with the request, with higher numbers meaning greater potential impact (e.g.0 = low impact, 5 = high impact).",
     Items = "Numeric values."
   ) |>
 
@@ -289,7 +289,7 @@ info_columns(
   
   info_columns(
     columns = vars(risk_score),
-    info = "The standardised numeric score representing the calculated or inherent risk level of the proposed solution (higher number = higher intrinsic risk).",
+    info = "Numeric risk score associated with the request (25 = high risk, 0 = low risk).",
     Items = "Numeric values."
   ) |>
   
@@ -305,7 +305,7 @@ info_columns(
   
   info_columns(
     columns = vars(updates),
-    info = "A count detailing the total number of significant updates or review cycles documented for this request's lifecycle. Acts as a measure of maturity/engagement.",
+    info = "Number of updates recorded against the request.",
     Items = "Numeric values."
   ) |>
   
@@ -508,19 +508,19 @@ info_columns(
   info_columns(
     columns = vars(contact_type),
     Items = "Contact method.",
-    info = "The primary and preferred communication method (e.g., 'Email', 'Direct Call', 'Secure Portal Message') for follow-up communications regarding the status of this request."
+    info = "Field of uncertain value. It may indicate the preferred method of contact for the requestor or stakeholders (e.g., 'Email', 'Phone', 'In-person')"
   ) |>
   
   info_columns(
     columns = vars(demand),
     Items = "Free-text field.",
-    info = "A consolidated view combining both the common name and the unique identifier used to reference this demand within the primary source operational system (e.g., 'Radiology Demand #2345')."
+    info = "An alternative project title that provides a descriptive name for the request and also includes the unique identifier (digital_request_number)."
   ) |>
   
   info_columns(
     columns = vars(escalation),
     Items = "Escalation category.",
-    info = "The current official escalation status of the request (e.g., 'Escalated to Board', 'Under Review by CIO'). Defines its current governance pathway and urgency level."
+    info = "Field of uncertain value. It may indicate the escalation status or category of the request (e.g., 'Normal')."
   ) |>
   
   info_columns(
