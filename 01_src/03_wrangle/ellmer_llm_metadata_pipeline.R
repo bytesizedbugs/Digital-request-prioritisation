@@ -21,11 +21,24 @@ base_url <- Sys.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 output_file <- here::here("02_data_output", "dig_req_llm_metadata_2.rds")
 n_requests <- 3 # number of requests to process while testing; use Inf for all
 
-# The schema (keys, types, rules) is defined once, in the prompt file
-metadata_fields <- c(
-  "summary", "key_problem", "requested_outcome", "stakeholders", "business_area",
-  "expected_benefits", "dependencies", "risks_or_constraints", "priority_indicators",
-  "themes"
+# Output schema, enforced by Ollama via structured output (so no JSON parsing is needed).
+# Field guidance lives in the prompt file.
+str_list <- function(desc) ellmer::type_array(ellmer::type_string(), description = desc)
+metadata_type <- ellmer::type_object(
+  summary = ellmer::type_string("2-3 sentence executive summary"),
+  key_problem = ellmer::type_string(),
+  requested_outcome = ellmer::type_string(),
+  stakeholders = str_list("people, teams or services affected"),
+  business_area = ellmer::type_string(),
+  expected_benefits = str_list(NULL),
+  dependencies = str_list(NULL),
+  risks_or_constraints = str_list(NULL),
+  priority_indicators = str_list(NULL),
+  themes = str_list("1-5 short thematic labels")
+)
+review_type <- ellmer::type_object(
+  findings = str_list("omissions or errors found; empty if none"),
+  metadata = metadata_type
 )
 system_prompt <- paste(
   readLines(here::here("01_src", "03_wrangle", "Prompts", "prompt-digital-request-analysis.md")),
@@ -34,30 +47,17 @@ system_prompt <- paste(
 dictionary <- paste(as.character(btw::btw(informant_data_dig_req)), collapse = "\n")
 
 ## Helpers ----------------
-# Ask a fresh chat for JSON; retry with the error message until required keys are present
-ask_json <- function(prompt, required_keys) {
+# Ask a fresh chat for output matching `type`; retry on failure (e.g. truncated output)
+ask_json <- function(prompt, type) {
   chat <- chat_ollama(
     system_prompt = system_prompt, base_url = base_url, model = model_name,
     api_args = list(options = list(num_ctx = 32768, temperature = 0)), echo = "none"
   )
-  error <- NULL
   for (i in seq_len(max_retries)) {
-    p <- if (is.null(error)) prompt else paste0(prompt, "\n\nYour previous reply was invalid (", error, "). Return valid JSON only.")
-    out <- tryCatch({
-      txt <- chat$chat(p, echo = "none")
-      json <- regmatches(txt, regexpr("\\{.*\\}", txt)) # first '{' to last '}'
-      if (!length(json)) stop("no JSON object found")
-      parsed <- jsonlite::fromJSON(json, simplifyVector = FALSE)
-      missing <- setdiff(required_keys, names(parsed))
-      if (length(missing)) stop("missing keys: ", paste(missing, collapse = ", "))
-      parsed
-    }, error = function(e) {
-      error <<- conditionMessage(e)
-      NULL
-    })
-    if (!is.null(out)) return(out)
+    out <- tryCatch(chat$chat_structured(prompt, type = type, echo = "none"), error = function(e) e)
+    if (!inherits(out, "error")) return(out)
   }
-  warning("No valid JSON after ", max_retries, " attempts: ", error)
+  warning("No valid output after ", max_retries, " attempts: ", conditionMessage(out))
   NULL
 }
 
@@ -68,7 +68,7 @@ extract <- function(row) {
   ask_json(
     paste0("Analyse this digital request record and return the metadata JSON object.\n\n",
            "Data dictionary:\n", dictionary, "\n\nSource record:\n", to_json(row, na = "string")),
-    metadata_fields
+    metadata_type
   )
 }
 
@@ -80,7 +80,7 @@ review <- function(row, metadata, stage) {
            "Return a JSON object with two keys: \"findings\" (array of strings; empty if none) ",
            "and \"metadata\" (the corrected metadata object, same keys as before).\n\n",
            "Original record:\n", to_json(row, na = "string"), "\n\nMetadata to review:\n", to_json(metadata)),
-    c("findings", "metadata")
+    review_type
   )
 }
 
