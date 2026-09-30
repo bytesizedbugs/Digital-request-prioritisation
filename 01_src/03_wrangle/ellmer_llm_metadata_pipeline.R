@@ -86,15 +86,28 @@ review <- function(row, metadata, stage) {
 
 process_row <- function(row) {
   v1 <- extract(row)
-  r2 <- if (!is.null(v1)) review(row, v1, 2)
-  v2 <- r2$metadata %||% v1
-  r3 <- if (!is.null(v2)) review(row, v2, 3)
-  v3 <- r3$metadata %||% v2
+  
+  r2 <- if (!is.null(v1)) review(row, v1, 2) else NULL
+  v2 <- if (is.null(r2)) v1 else r2$metadata
+  
+  r3 <- if (!is.null(v2)) review(row, v2, 3) else NULL
+  v3 <- if (is.null(r3)) v2 else r3$metadata
+  
   tibble::tibble(
     request_row_id = row$request_row_id,
-    metadata_v1 = list(v1), findings_v2 = list(unlist(r2$findings)), metadata_v2 = list(v2),
-    findings_v3 = list(unlist(r3$findings)), metadata_v3 = list(v3),
-    model = model_name, processed_at = Sys.time(), source_record = list(row)
+    digital_request_number = row$digital_request_number,
+    metadata_v1 = list(v1),
+    findings_v2 = list(
+      if (is.null(r2)) character() else unlist(r2$findings)
+    ),
+    metadata_v2 = list(v2),
+    findings_v3 = list(
+      if (is.null(r3)) character() else unlist(r3$findings)
+    ), 
+    metadata_v3 = list(v3),
+    model = model_name,
+    processed_at = Sys.time(),
+    source_record = list(row)
   )
 }
 
@@ -102,8 +115,19 @@ process_row <- function(row) {
 requests <- data_dig_req |>
   mutate(request_row_id = row_number(), .before = 1) |>
   head(n_requests)
-done <- if (file.exists(output_file)) readRDS(output_file)
-todo <- filter(requests, !request_row_id %in% done$request_row_id)
+done <- if (file.exists(output_file)) {
+  readRDS(output_file)
+} else {
+  tibble::tibble()
+}
+todo <- if (nrow(done) == 0) {
+  requests
+} else {
+  filter(
+    requests,
+    !request_row_id %in% done$request_row_id
+  )
+}
 
 results <- purrr::map(seq_len(nrow(todo)), \(i) {
   message("Processing request ", i, " of ", nrow(todo))
@@ -111,4 +135,12 @@ results <- purrr::map(seq_len(nrow(todo)), \(i) {
 }) |> bind_rows()
 
 dir.create(dirname(output_file), showWarnings = FALSE, recursive = TRUE)
-saveRDS(bind_rows(done, results), output_file) # join to data_dig_req via request_row_id
+saveRDS(
+  bind_rows(done, results) |>
+    distinct(
+      request_row_id,
+      .keep_all = TRUE
+    ),
+  output_file
+) # contains both request_row_id and digital_request_number
+
