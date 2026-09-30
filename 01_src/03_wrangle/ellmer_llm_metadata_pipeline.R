@@ -5,8 +5,8 @@
 # Output: 02_data_output/dig_req_llm_metadata_2.rds (read by 07_report/digital_request_themes.qmd)
 
 source(here::here("01_src", "01_startup", "01_initialise.R"))
-source(here::here("01_src", "01_startup", "02_data_import.R"))
-source(here::here("01_src", "03_wrangle", "06_data_dictionary - data_dig_req.R"))
+source(here::here("01_src", "02_data_import", "02_data_import.R"))
+source(here::here("06_data_dictionary", "06_data_dictionary - data_dig_req.R"))
 # source(here::here("01_src", "03_wrangle", "ellmer_chat_with_ollama - digital request analysis.R"))
 
 # library(ellmer)
@@ -129,8 +129,11 @@ process_row <- function(row) {
   )
 }
 
+# Reduce number of digital requests used during testing to speed up process
+data_dig_req_short <- data_dig_req[1:3, ] #only keep 3 digital requests for now
+
 ## Run (resumable: only unprocessed rows are analysed) ----------------
-requests <- data_dig_req |> mutate(request_row_id = row_number(), .before = 1)
+requests <- data_dig_req_short |> mutate(request_row_id = row_number(), .before = 1)
 done <- if (file.exists(output_file)) readRDS(output_file) else NULL
 todo <- requests |> filter(!request_row_id %in% done$request_row_id)
 
