@@ -1,0 +1,65 @@
+---
+title: "Digital request themes (LLM metadata, version 3)"
+format:
+  html:
+    toc: true
+    code-fold: true
+    embed-resources: true
+---
+
+```{r}
+#| label: setup
+#| include: false
+library(dplyr)
+library(tidyr)
+library(purrr)
+library(knitr)
+res <- readRDS(here::here("02_data_output", "dig_req_llm_metadata_2.rds"))
+flat <- res |>
+  mutate(
+    summary = map_chr(metadata_v3, ~ .x$summary %||% NA_character_),
+    business_area = map_chr(metadata_v3, ~ .x$business_area %||% NA_character_),
+    themes = map(metadata_v3, ~ unlist(.x$themes)),
+    n_findings_v2 = lengths(findings_v2),
+    n_findings_v3 = lengths(findings_v3)
+  )
+```
+
+## Theme frequencies
+
+```{r}
+themes <- flat |> select(request_row_id, themes) |> unnest(themes)
+themes |> count(themes, sort = TRUE) |> kable()
+```
+
+## Potentially related or duplicate requests
+
+Requests sharing two or more themes.
+
+```{r}
+pairs <- inner_join(themes, themes, by = "themes", relationship = "many-to-many") |>
+  filter(request_row_id.x < request_row_id.y) |>
+  group_by(request_row_id.x, request_row_id.y) |>
+  summarise(shared_themes = paste(themes, collapse = "; "), n = n(), .groups = "drop") |>
+  filter(n >= 2) |> arrange(desc(n))
+kable(pairs)
+```
+
+## Request summaries
+
+```{r}
+flat |>
+  transmute(request_row_id, business_area, themes = map_chr(themes, paste, collapse = "; "), summary) |>
+  kable()
+```
+
+## Quality assurance findings
+
+```{r}
+flat |>
+  transmute(request_row_id,
+            findings_v2 = map_chr(findings_v2, paste, collapse = " | "),
+            findings_v3 = map_chr(findings_v3, paste, collapse = " | ")) |>
+  filter(findings_v2 != "" | findings_v3 != "") |>
+  kable()
+```

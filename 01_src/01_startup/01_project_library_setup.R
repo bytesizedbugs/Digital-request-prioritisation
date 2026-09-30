@@ -1,5 +1,7 @@
 # For new project collaborators ---------------------------------------------------------
 
+options(download.file.method = "wininet")
+
 # #install {renv} if not already done so -------------------
 if (!require("renv")) {
   install.packages("renv", 
@@ -19,6 +21,8 @@ init(bare = TRUE, restart = FALSE)
 # Update options ----------------------------------------------------------
 
 options(
+  download.file.method = "wininet",
+  renv.download.override = utils::download.file,
   renv.config.repos.override = "https://packagemanager.posit.co/cran/latest",
   renv.config.install.verbose = TRUE, # This will give more information in the console while installing the R packages, which may give more error details
   renv.config.connect.timeout = 5, # default is 20 seconds

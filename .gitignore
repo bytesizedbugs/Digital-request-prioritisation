@@ -47,7 +47,7 @@ images/
 # ignore email templates
 *.oft
 
-# ignore compiled source 
+# ignore compiled source
 *.com
 *.class
 *.dll
@@ -67,12 +67,12 @@ images/
 *.tar
 *.zip
 
-# Ignore logs and databases 
+# Ignore logs and databases
 *.log
 *.sql
 *.sqlite
 
-# Ignore OS generated files 
+# Ignore OS generated files
 .DS_Store
 .DS_Store?
 ._*
@@ -137,3 +137,5 @@ rsconnect/
 
 .Renviron
 .vscode/settings.json
+
+**/*.quarto_ipynb

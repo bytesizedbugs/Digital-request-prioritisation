@@ -1,3 +1,5 @@
+options(download.file.method = "wininet")
+
 # here --------------------------------------------------------------------
 
 if (!require("here")) {
@@ -24,48 +26,27 @@ library(renv)
 # list packages to download -----------------------------------------------
 
 packages_to_download <- c(
-  "tidymodels", #https://www.tidymodels.org/packages/ The core tidymodels packages work together to enable a wide variety of modeling approaches
   "dotenv", # for reading ".env" file
-  "AMR", #organism ID and susceptibility data wrangling
-  "cleaner", #to help analyse organism data created using AMR package
+  "jsonlite", # for reading/writing JSON files
+  "cleaner", #to help analyse data
   "bookdown", # required to set knitr options
   "here", # for finding files
-  "tidytext", # for text cleaning tools
   "shiny", # for viewing rendered quarto reports (?)
   "quarto", # for quarto report rendering scripts
   "flextable", # for creating pretty (non-interactive) tables
-  #"reactable", # for creating interactive tables in quarto reports
-  #"plotly", # for creating interactive charts in quarto reports
-  "excel.link", # to read password protected excel files (xl.read.file function)
-  # "dplyr",
-  # "lubridate",
-  # "stringr",
-  # "forcats",
-  # "purrr",
-  "odbc", # for SQL connection to APEX
-  "gt",
-  "knitr",
-  "DBI", # for SQL connection to APEX
-  "NHSRplotthedots", # QI work
-  "RSQLite",
+  "knitr", # for creating pretty (non-interactive) tables
   "skimr", # Compact and Flexible Summaries of Data
-  "tidyverse",
-  "networkD3", #for sankey diagrams
+  "tidyverse", # for data wrangling and visualisation
   "readr", #to read csv files
   "readxl", #to read excel files
+  "btw", # for creating tables with summary statistics
   "janitor", # clean_names function
-  "beepr",
-  "bench", # for timing SQL queries
-  "openxlsx",
-  #"waffle", # for e.g. Waffle Chart Showing Survival Rates
-  "ggrepel", # for geom_label_repel function... geom_label_repel draws a rectangle underneath the text, making it easier to read. The text labels repel away from each other and away from the data points.
-  #"trelliscopejs" # for creating interactive dashboards in quarto reports
-  "dlookr", # for creating data diagnosis reports
-  "kknn", # for building k-nearest neighbour models
-  "xfun",
-  "corrplot", # for plotting data from correlation matrices
-  "butcher", # for reducing size of model objects before saving
-  "bundle" # for collecting together all info associated with a model object before saving
+  "beepr", # for audio notification when code finishes running
+  "ellmer", # for LLMs
+  "ollamar", # The Ollama R library is the easiest way to integrate R with Ollama, which lets you run language models locally on your own machine
+  "curl", # for downloading files from URLs
+  "reticulate", # for using Python in R
+  "pointblank" # for data validation and testing
 )
 
 # check packages already installed vs. listed for install -----------------
@@ -150,6 +131,28 @@ knitr::opts_chunk$set(
 # theme minimal -----------------------------------------------------------
 
 ggplot2::theme_set(ggplot2::theme_minimal())
+
+
+# ellmer options  -----------------------------------------------------------------
+
+# https://ellmer.tidyverse.org/news/index.html?q=timeout#new-features-0-3-0
+
+# timeout -------------
+
+# The default timeout, controlled by option(ellmer_timeout_s), now applies to the initial connection phase. Together, these changes should make it much more likely for ellmer requests to succeed.
+
+# Timeout -- must be set before initialising the chat object
+options(ellmer_timeout_s = 1800)   # 30 minutes; default is 300 s (5 min)
+# 
+# withr::local_options(ellmer_timeout_s = 1800)  # 30 minutes; default is 300 s (5 min)
+
+# retries -------------
+
+# ellmer now retries requests up to 3 times, controllable with option(ellmer_max_tries), and will retry if the connection fails (rather than just if the request itself returns a transient error).
+
+# options(ellmer_max_tries = 3)
+# 
+# withr::local_options(ellmer_max_tries = 3)
 
 # Update packages (optional) ----------------------------------------------
 
