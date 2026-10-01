@@ -273,7 +273,7 @@ info_columns(
   
   info_columns(
     columns = vars(impact_value),
-    info = "Numeric impact score associated with the request, with higher numbers meaning greater potential impact (e.g.0 = low impact, 5 = high impact).",
+    info = "Numeric impact score associated with the request, with higher numbers meaning greater potential impact (e.g. 0 = low impact, 5 = high impact).",
     Items = "Numeric values."
   ) |>
 
@@ -532,7 +532,7 @@ info_columns(
   info_columns(
     columns = vars(imported_notes),
     Items = "Free-text field.",
-    info = "Important contextual notes or summaries pulled forward into this record from previous systems (e.g., 'Predecessor system noted high dependency on X API'). Helps trace history and prevent assumption creep."
+    info = "Information pulled forward into this record from previous legacy systems."
   ) |>
   
   info_columns(

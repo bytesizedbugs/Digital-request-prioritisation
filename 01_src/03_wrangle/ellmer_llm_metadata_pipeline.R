@@ -16,134 +16,131 @@ source(here::here("06_data_dictionary", "06_data_dictionary - data_dig_req.R"))
 
 ## Config ----------------
 model_name <- "gemma4"
-max_json_retries <- 3
+max_retries <- 3
 base_url <- Sys.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 output_file <- here::here("02_data_output", "dig_req_llm_metadata_2.rds")
+n_requests <- 3 # number of requests to process while testing; use Inf for all
 
-metadata_fields <- c(
-  "summary", "key_problem", "requested_outcome", "stakeholders", "business_area",
-  "expected_benefits", "dependencies", "risks_or_constraints", "priority_indicators",
-  "themes"
+# Output schema, enforced by Ollama via structured output (so no JSON parsing is needed).
+# Field guidance lives in the prompt file.
+str_list <- function(desc) ellmer::type_array(ellmer::type_string(), description = desc)
+metadata_type <- ellmer::type_object(
+  summary = ellmer::type_string("2-3 sentence executive summary"),
+  key_problem = ellmer::type_string(),
+  requested_outcome = ellmer::type_string(),
+  stakeholders = str_list("people, teams or services affected"),
+  business_area = ellmer::type_string(),
+  expected_benefits = str_list(NULL),
+  dependencies = str_list(NULL),
+  risks_or_constraints = str_list(NULL),
+  priority_indicators = str_list(NULL),
+  themes = str_list("1-5 short thematic labels")
 )
-
+review_type <- ellmer::type_object(
+  findings = str_list("omissions or errors found; empty if none"),
+  metadata = metadata_type
+)
 system_prompt <- paste(
   readLines(here::here("01_src", "03_wrangle", "Prompts", "prompt-digital-request-analysis.md")),
   collapse = "\n"
 )
+dictionary <- paste(as.character(btw::btw(informant_data_dig_req)), collapse = "\n")
 
-json_rules <- paste(
-  "Respond with valid JSON only: no markdown, no code fences, no explanatory text.",
-  "Use UK English. Do not invent facts; use \"Not stated\" where information is missing.",
-  sprintf("The metadata object must have exactly these keys: %s.", paste(metadata_fields, collapse = ", ")),
-  "\"themes\" must be a JSON array of one or more short thematic labels (buckets) that help",
-  "identify similar or duplicate requests. All other fields are strings, except \"stakeholders\",",
-  "\"expected_benefits\", \"dependencies\", \"risks_or_constraints\" and \"priority_indicators\"",
-  "which are arrays of strings."
-)
-
-## Helpers (DRY) ----------------
-new_chat <- function() {
-  chat_ollama(
-    system_prompt = system_prompt,
-    base_url = base_url,
-    model = model_name,
-    api_args = list(options = list(num_ctx = 32768, temperature = 0)),
-    echo = "none"
+## Helpers ----------------
+# Ask a fresh chat for output matching `type`; retry on failure (e.g. truncated output)
+ask_json <- function(prompt, type) {
+  chat <- chat_ollama(
+    system_prompt = system_prompt, base_url = base_url, model = model_name,
+    api_args = list(options = list(num_ctx = 32768, temperature = 0)), echo = "none"
   )
-}
-
-# Strip accidental code fences / surrounding text, then parse
-parse_json_strict <- function(txt) {
-  txt <- trimws(gsub("^```(json)?|```$", "", trimws(txt)))
-  start <- regexpr("\\{", txt)
-  end <- max(gregexpr("\\}", txt)[[1]])
-  if (start < 0 || end < start) stop("No JSON object found")
-  fromJSON(substr(txt, start, end), simplifyVector = FALSE)
-}
-
-# Ask the LLM and retry until valid JSON (with required keys) is returned
-ask_json <- function(prompt, required_keys) {
-  chat <- new_chat()
-  last_error <- NULL
-  for (i in seq_len(max_json_retries)) {
-    p <- if (is.null(last_error)) prompt else
-      paste0(prompt, "\n\nYour previous reply was not valid: ", last_error, ". Return valid JSON only.")
-    out <- tryCatch({
-      parsed <- parse_json_strict(chat$chat(p, echo = "none"))
-      missing_keys <- setdiff(required_keys, names(parsed))
-      if (length(missing_keys)) stop("missing keys: ", paste(missing_keys, collapse = ", "))
-      parsed
-    }, error = function(e) {
-      last_error <<- conditionMessage(e)
-      NULL
-    })
-    if (!is.null(out)) return(out)
+  for (i in seq_len(max_retries)) {
+    out <- tryCatch(chat$chat_structured(prompt, type = type, echo = "none"), error = function(e) e)
+    if (!inherits(out, "error")) return(out)
   }
-  warning("Failed to obtain valid JSON after ", max_json_retries, " attempts: ", last_error)
+  warning("No valid output after ", max_retries, " attempts: ", conditionMessage(out))
   NULL
 }
 
-record_json <- function(row) toJSON(as.list(row), auto_unbox = TRUE, null = "null", na = "string")
-to_json <- function(x) toJSON(x, auto_unbox = TRUE, null = "null")
+to_json <- function(x, ...) jsonlite::toJSON(x, auto_unbox = TRUE, null = "null", ...)
 
-# Stage 1: extraction from the source record
-extract_v1 <- function(row) {
+# Stage 1: extract metadata from the source record
+extract <- function(row) {
   ask_json(
-    paste0(
-      "Analyse this digital request record and generate structured metadata.\n",
-      json_rules, "\nReturn a JSON object with the metadata keys only.\n\n",
-      "Data dictionary:\n", paste(as.character(btw::btw(informant_data_dig_req)), collapse = "\n"),
-      "\n\nSource record:\n", record_json(row)
-    ),
-    metadata_fields
+    paste0("Analyse this digital request record and return the metadata JSON object.\n\n",
+           "Data dictionary:\n", dictionary, "\n\nSource record:\n", to_json(row, na = "string")),
+    metadata_type
   )
 }
 
-# Stages 2 and 3: validate the previous version against the source and refine it
-validate_refine <- function(row, previous, stage_label) {
+# Stages 2 and 3: check metadata against the record and correct it
+review <- function(row, metadata, stage) {
   ask_json(
-    paste0(
-      "Quality assurance review (", stage_label, "). Compare the metadata below with the original record.\n",
-      "Check completeness, fidelity to the source, unsupported assumptions, factual errors,",
-      " accuracy of themes and missed contextual information.\n", json_rules,
-      "\nReturn a JSON object with two keys: \"findings\" (array of strings describing glaring omissions",
-      " or errors; empty array if none) and \"metadata\" (the refined metadata object).\n\n",
-      "Original record:\n", record_json(row), "\n\nMetadata to review:\n", to_json(previous)
-    ),
-    c("findings", "metadata")
+    paste0("Quality assurance review (stage ", stage, "). Compare the metadata below with the original record ",
+           "for omissions, unsupported statements, errors and poor themes, then correct it.\n",
+           "Return a JSON object with two keys: \"findings\" (array of strings; empty if none) ",
+           "and \"metadata\" (the corrected metadata object, same keys as before).\n\n",
+           "Original record:\n", to_json(row, na = "string"), "\n\nMetadata to review:\n", to_json(metadata)),
+    review_type
   )
 }
 
-# Full three-stage pipeline for one row
 process_row <- function(row) {
-  v1 <- extract_v1(row)
-  r2 <- if (!is.null(v1)) validate_refine(row, v1, "stage 2, version 1 -> version 2")
-  v2 <- r2$metadata %||% v1
-  r3 <- if (!is.null(v2)) validate_refine(row, v2, "stage 3, version 2 -> version 3")
-  v3 <- r3$metadata %||% v2
+  v1 <- extract(row)
+  
+  r2 <- if (!is.null(v1)) review(row, v1, 2) else NULL
+  v2 <- if (is.null(r2)) v1 else r2$metadata
+  
+  r3 <- if (!is.null(v2)) review(row, v2, 3) else NULL
+  v3 <- if (is.null(r3)) v2 else r3$metadata
+  
   tibble::tibble(
     request_row_id = row$request_row_id,
-    metadata_v1 = list(v1), findings_v2 = list(unlist(r2$findings)), metadata_v2 = list(v2),
-    findings_v3 = list(unlist(r3$findings)), metadata_v3 = list(v3),
-    model = model_name, processed_at = Sys.time()
+    digital_request_number = row$digital_request_number,
+    metadata_v1 = list(v1),
+    findings_v2 = list(
+      if (is.null(r2)) character() else unlist(r2$findings)
+    ),
+    metadata_v2 = list(v2),
+    findings_v3 = list(
+      if (is.null(r3)) character() else unlist(r3$findings)
+    ), 
+    metadata_v3 = list(v3),
+    model = model_name,
+    processed_at = Sys.time(),
+    source_record = list(row)
   )
 }
 
-# Reduce number of digital requests used during testing to speed up process
-data_dig_req_short <- data_dig_req[1:3, ] #only keep 3 digital requests for now
+## Run (resumable: rows already in output_file are skipped) ----------------
+requests <- data_dig_req |>
+  mutate(request_row_id = row_number(), .before = 1) |>
+  head(n_requests)
+done <- if (file.exists(output_file)) {
+  readRDS(output_file)
+} else {
+  tibble::tibble()
+}
+todo <- if (nrow(done) == 0) {
+  requests
+} else {
+  filter(
+    requests,
+    !request_row_id %in% done$request_row_id
+  )
+}
 
-## Run (resumable: only unprocessed rows are analysed) ----------------
-requests <- data_dig_req_short |> mutate(request_row_id = row_number(), .before = 1)
-done <- if (file.exists(output_file)) readRDS(output_file) else NULL
-todo <- requests |> filter(!request_row_id %in% done$request_row_id)
-
-results <- purrr::map(seq_len(nrow(todo)), function(i) {
+results <- purrr::map(seq_len(nrow(todo)), \(i) {
   message("Processing request ", i, " of ", nrow(todo))
-  res <- process_row(as.list(todo[i, ]))
-  res$source_record <- list(as.list(todo[i, ]))
-  res
+  process_row(as.list(todo[i, ]))
 }) |> bind_rows()
 
-all_results <- bind_rows(done, results)
 dir.create(dirname(output_file), showWarnings = FALSE, recursive = TRUE)
-saveRDS(all_results, output_file) # join back to data_dig_req via request_row_id
+saveRDS(
+  bind_rows(done, results) |>
+    distinct(
+      request_row_id,
+      .keep_all = TRUE
+    ),
+  output_file
+) # contains both request_row_id and digital_request_number
+
