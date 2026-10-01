@@ -41,9 +41,7 @@ flat <- res |>
     themes = map(
       metadata_v3,
       ~ unlist(.x$themes)
-    ),
-    n_findings_v2 = lengths(findings_v2),
-    n_findings_v3 = lengths(findings_v3)
+    )
   )
 
 themes <- flat |>
@@ -190,7 +188,6 @@ The report is intended to support prioritisation and portfolio review by:
 * identifying common request themes
 * highlighting potentially related or duplicate requests
 * summarising requests by business area
-* identifying records with quality assurance findings
 
 ## Summary statistics
 
@@ -199,14 +196,12 @@ summary_tbl <- tibble(
   Metric = c(
     "Requests analysed",
     "Business areas",
-    "Themes",
-    "Requests with QA findings"
+    "Themes"
   ),
   Value = c(
     nrow(flat),
     n_distinct(flat$business_area, na.rm = TRUE),
-    n_distinct(themes$themes, na.rm = TRUE),
-    sum(flat$n_findings_v2 > 0 | flat$n_findings_v3 > 0)
+    n_distinct(themes$themes, na.rm = TRUE)
   )
 )
 
@@ -336,38 +331,6 @@ flat |>
   interactive_table(nrow = 5, 
                                       not_as_factor = c("themes", 
                                                         "summary"
-                                                        ),
-                                ) 
-```
-
-# Quality assurance findings
-
-The records below have one or more quality assurance findings generated during metadata extraction.
-
-```{r}
-qa <- flat |>
-  transmute(
-    digital_request_number,
-    n_findings = n_findings_v2 + n_findings_v3,
-    findings = pmap_chr(
-      list(findings_v2, findings_v3),
-      \(v2, v3) {
-        c(v2, v3) |>
-          unique() |>
-          paste(collapse = "\n\n• ")
-      }
-    )
-  ) |>
-  mutate(
-    findings = paste0("• ", findings)
-  ) |>
-  filter(n_findings > 0) |>
-  arrange(desc(n_findings))
-
-qa |>
-   interactive_table(nrow = 5, 
-                                      not_as_factor = c("findings", 
-                                                        "patient"
                                                         ),
                                 ) 
 ```

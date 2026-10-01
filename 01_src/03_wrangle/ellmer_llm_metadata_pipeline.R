@@ -36,10 +36,6 @@ metadata_type <- ellmer::type_object(
   priority_indicators = str_list(NULL),
   themes = str_list("1-5 short thematic labels")
 )
-review_type <- ellmer::type_object(
-  findings = str_list("omissions or errors found; empty if none"),
-  metadata = metadata_type
-)
 system_prompt <- paste(
   readLines(here::here("01_src", "03_wrangle", "Prompts", "prompt-digital-request-analysis.md")),
   collapse = "\n"
@@ -77,10 +73,9 @@ review <- function(row, metadata, stage) {
   ask_json(
     paste0("Quality assurance review (stage ", stage, "). Compare the metadata below with the original record ",
            "for omissions, unsupported statements, errors and poor themes, then correct it.\n",
-           "Return a JSON object with two keys: \"findings\" (array of strings; empty if none) ",
-           "and \"metadata\" (the corrected metadata object, same keys as before).\n\n",
+           "Return the corrected metadata JSON object, with the same keys as before.\n\n",
            "Original record:\n", to_json(row, na = "string"), "\n\nMetadata to review:\n", to_json(metadata)),
-    review_type
+    metadata_type
   )
 }
 
@@ -88,22 +83,16 @@ process_row <- function(row) {
   v1 <- extract(row)
   
   r2 <- if (!is.null(v1)) review(row, v1, 2) else NULL
-  v2 <- if (is.null(r2)) v1 else r2$metadata
+  v2 <- if (is.null(r2)) v1 else r2
   
   r3 <- if (!is.null(v2)) review(row, v2, 3) else NULL
-  v3 <- if (is.null(r3)) v2 else r3$metadata
+  v3 <- if (is.null(r3)) v2 else r3
   
   tibble::tibble(
     request_row_id = row$request_row_id,
     digital_request_number = row$digital_request_number,
     metadata_v1 = list(v1),
-    findings_v2 = list(
-      if (is.null(r2)) character() else unlist(r2$findings)
-    ),
     metadata_v2 = list(v2),
-    findings_v3 = list(
-      if (is.null(r3)) character() else unlist(r3$findings)
-    ), 
     metadata_v3 = list(v3),
     model = model_name,
     processed_at = Sys.time(),
