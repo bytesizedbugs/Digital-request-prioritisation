@@ -53,13 +53,132 @@ themes <- flat |>
     business_area,
     themes
   ) |>
-  unnest(themes)
+  unnest(themes) |>
+  distinct(digital_request_number, themes, .keep_all = TRUE)
+
+# Standardise capitalisation
+themes_clean <- themes |>
+  mutate(
+    themes = str_squish(themes),
+    themes = str_to_title(themes)
+  )
+
+# Create groupings
+theme_group = case_when(
+
+  str_detect(themes, regex("AI|Artificial Intelligence")) ~
+    "AI",
+
+  str_detect(themes, regex(
+    "Radiology|Imaging|PACS|RIS|Ultrasound|MRI",
+    TRUE
+  )) ~
+    "Radiology & Imaging",
+
+  str_detect(themes, regex(
+    "Laboratory|LIMS|LIS|GLIMS|Pathology|Genetics",
+    TRUE
+  )) ~
+    "Laboratory Systems",
+
+  str_detect(themes, regex(
+    "Pharmacy|Medication|Prescribing|Drug",
+    TRUE
+  )) ~
+    "Pharmacy",
+
+  str_detect(themes, regex(
+    "Data|Database|Reporting|Dashboard|Governance",
+    TRUE
+  )) ~
+    "Data & Information",
+
+  str_detect(themes, regex(
+    "Integration|Interoperability|Interface|SSO",
+    TRUE
+  )) ~
+    "Integration",
+
+  str_detect(themes, regex(
+    "Migration|Replacement|Upgrade|Modernisation|Modernization",
+    TRUE
+  )) ~
+    "System Change",
+
+  str_detect(themes, regex(
+    "Workflow|Process|Automation|Efficiency",
+    TRUE
+  )) ~
+    "Workflow",
+
+  str_detect(themes, regex(
+    "Infrastructure|Hosting|Cloud|VM|Network|Hardware",
+    TRUE
+  )) ~
+    "Infrastructure",
+
+  str_detect(themes, regex(
+    "Patient|Outpatient|Referral|Care Pathway",
+    TRUE
+  )) ~
+    "Patient Pathways",
+
+  TRUE ~ "Other"
+)
+
+# Flextable ---------------
 
 theme_ft <- function(x) {
   x |>
-    theme_booktabs() |>
-    autofit()
+  autofit() |>
+  theme_booktabs()
+  }
+
+# DT:datatable ------------------------------------------------------------
+
+# Use DT:datatable to embed an interactive table with export options in an R session or markdown document
+
+# copied from github: jbisanz/qiime2R/R/interactive_table.R
+# https://rstudio.github.io/DT/options.html ... "DataTables has a large number of initialization options, which make it very flexible to customize the table."
+
+interactive_table <- function(table, 
+                              nrow = 5, 
+                              not_as_factor = c("mrn", 
+                                                "patient"
+                                                ),
+                              autoWidth = TRUE
+) {
+  # mutate(across(where(is.character) using forcats::as_factor, avoiding items in "not_as_factor"
+  table <- table |> 
+    mutate(across(where(is.character) 
+                  & !matches(not_as_factor), 
+                  forcats::as_factor))
+  
+  # configure table settings
+  dtable <- DT::datatable(table, 
+                          extensions = 'Buttons', 
+                          filter = "top",
+                          options = list(
+                            pageLength = nrow, #nrow dictates pageLength,
+                            #lengthMenu = c(5, 10, 15, 20),
+                            # initComplete = JS(
+                            #   "function(settings, json) {",
+                            #   "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});", #we use the initComplete callback function in options to change the background color of the table header to black after the initialization:
+                            #   "}"
+                            dom = 'Bfrtip', 
+                            buttons = c('copy',
+                                        'csv',
+                                        #'pdf',
+                                        'excel'
+                                        ),
+                            autoWidth = autoWidth,
+                            searchHighlight = TRUE)
+  )
+  
+  return(dtable)
 }
+
+
 ```
 
 # Overview
@@ -98,25 +217,45 @@ summary_tbl |>
 
 # Most common themes
 
-## Theme frequencies
+## Word cloud
 
 ```{r}
+#| out-width: 100%
+#| fig-width: 16
+#| fig-height: 12
+
 theme_counts <- themes |>
   count(themes, sort = TRUE) |>
-  mutate(
-    percentage = percent(n / sum(n), accuracy = 0.1)
-  )
+  #slice_head(n = 75) |> 
+  filter(n >= 2)
 
 theme_counts |>
-  flextable() |>
-  theme_ft()
+  slice_head(n = 75) |>
+  ggplot(
+    aes(
+      label = themes,
+      size = n,
+      colour = n
+    )
+  ) +
+  ggwordcloud::geom_text_wordcloud_area(
+    eccentricity = 0.5
+  ) +
+  scale_size_area(
+    max_size = 60
+  ) +
+  scale_colour_viridis_c() +
+  theme_void() +
+  theme(
+    legend.position = "none"
+  )
 ```
 
-## Top 15 themes
+## Top 20 themes
 
 ```{r}
 theme_counts |>
-  slice_head(n = 15) |>
+  slice_head(n = 20) |>
   ggplot(
     aes(
       x = reorder(themes, n),
@@ -124,35 +263,7 @@ theme_counts |>
     )
   ) +
   geom_col() +
-  coord_flip() +
-  labs(
-    title = "Most common themes",
-    x = NULL,
-    y = "Number of requests"
-  )
-```
-
-# Themes by business area
-
-The table below shows the most frequent themes within each business area.
-
-```{r}
-themes |>
-  count(
-    business_area,
-    themes,
-    sort = TRUE
-  ) |>
-  group_by(business_area) |>
-  slice_head(n = 5) |>
-  ungroup() |>
-  rename(
-    `Business area` = business_area,
-    Theme = themes,
-    Requests = n
-  ) |>
-flextable() |>
-theme_ft()
+  coord_flip()
 ```
 
 # Potentially related requests
@@ -194,9 +305,11 @@ pairs <- inner_join(
   )
 
 pairs |>
-  flextable() |>
-  width(j = "shared_themes", width = 4) |> #optional
-  theme_ft()
+    interactive_table(nrow = 5, 
+                                      not_as_factor = c("mrn", 
+                                                        "patient"
+                                                        ),
+                                ) 
 ```
 
 # Request summaries
@@ -220,9 +333,11 @@ flat |>
     business_area,
     digital_request_number
   ) |>
-  flextable() |>
-  width(j = "summary", width = 6) |> #optional
-  theme_ft()
+  interactive_table(nrow = 5, 
+                                      not_as_factor = c("themes", 
+                                                        "summary"
+                                                        ),
+                                ) 
 ```
 
 # Quality assurance findings
@@ -250,11 +365,11 @@ qa <- flat |>
   arrange(desc(n_findings))
 
 qa |>
-  flextable() |>
-  width(j = "findings", width = 8) |>
-  valign(valign = "top") |>
-  align(j = "n_findings", align = "center") |>
-  theme_ft()
+   interactive_table(nrow = 5, 
+                                      not_as_factor = c("findings", 
+                                                        "patient"
+                                                        ),
+                                ) 
 ```
 
 # Appendix
@@ -274,11 +389,4 @@ flat |>
   theme_ft()
 ```
 
-## All themes
 
-```{r}
-theme_counts |>
-  arrange(desc(n)) |>
-  flextable() |>
-  theme_ft()
-```
