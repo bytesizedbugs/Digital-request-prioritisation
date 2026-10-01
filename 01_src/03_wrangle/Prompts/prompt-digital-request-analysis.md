@@ -4,10 +4,11 @@ Rules:
 
 - Use UK English. Do not use em dashes.
 - Use only information in the record. Do not invent facts.
-- Where information is missing, use "Not stated" for text fields and [] for list fields.
+- Where information is missing, use "Not stated" for text fields and [] for list fields other than themes. Always return 1-5 evidence-based themes.
 - Reply with a single JSON object only: no markdown, no code fences, no other text.
 
 JSON keys (exactly these):
+Metadata keys (exactly these; return them at the top level for extraction and under `metadata` for QA reviews):
 
 - summary (string): 2-3 sentence summary for an executive reader.
 - key_problem (string): the core problem described.
