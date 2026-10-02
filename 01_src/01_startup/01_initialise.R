@@ -37,6 +37,8 @@ packages_to_download <- c(
   "knitr", # for creating pretty (non-interactive) tables
   "skimr", # Compact and Flexible Summaries of Data
   "tidyverse", # for data wrangling and visualisation
+  "ggwordcloud", # for creating wordclouds
+  "DT", # for creating interactive tables
   "readr", #to read csv files
   "readxl", #to read excel files
   "btw", # for creating tables with summary statistics

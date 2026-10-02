@@ -3,63 +3,330 @@ title: "Digital request themes (LLM metadata, version 3)"
 format:
   html:
     toc: true
+    toc-depth: 2
     code-fold: true
     embed-resources: true
+    number-sections: true
 ---
 
 ```{r}
 #| label: setup
 #| include: false
+
 library(dplyr)
 library(tidyr)
 library(purrr)
-library(knitr)
-res <- readRDS(here::here("02_data_output", "dig_req_llm_metadata_2.rds"))
+library(stringr)
+library(ggplot2)
+library(scales)
+library(flextable)
+
+res <- readRDS(
+  here::here(
+    "02_data_output",
+    "dig_req_llm_metadata_2.rds"
+  )
+)
+
 flat <- res |>
   mutate(
-    summary = map_chr(metadata_v3, ~ .x$summary %||% NA_character_),
-    business_area = map_chr(metadata_v3, ~ .x$business_area %||% NA_character_),
-    themes = map(metadata_v3, ~ unlist(.x$themes)),
-    n_findings_v2 = lengths(findings_v2),
-    n_findings_v3 = lengths(findings_v3)
+    summary = map_chr(
+      metadata_v3,
+      ~ .x$summary %||% NA_character_
+    ),
+    business_area = map_chr(
+      metadata_v3,
+      ~ .x$business_area %||% NA_character_
+    ),
+    themes = map(
+      metadata_v3,
+      ~ unlist(.x$themes)
+    )
+  )
+
+themes <- flat |>
+  select(
+    request_row_id,
+    digital_request_number,
+    business_area,
+    themes
+  ) |>
+  unnest(themes) |>
+  distinct(digital_request_number, themes, .keep_all = TRUE)
+
+# Standardise capitalisation
+themes_clean <- themes |>
+  mutate(
+    themes = str_squish(themes),
+    themes = str_to_title(themes)
+  )
+
+# create flat metadata table for later use in report
+flat_metadata <- res |>
+    select(
+        request_row_id,
+        digital_request_number,
+        metadata_v3
+    ) |>
+    unnest_wider(metadata_v3)
+
+# Flextable ---------------
+
+theme_ft <- function(x) {
+  x |>
+  autofit() |>
+  theme_booktabs()
+  }
+
+# DT:datatable ------------------------------------------------------------
+
+# Use DT:datatable to embed an interactive table with export options in an R session or markdown document
+
+# copied from github: jbisanz/qiime2R/R/interactive_table.R
+# https://rstudio.github.io/DT/options.html ... "DataTables has a large number of initialization options, which make it very flexible to customize the table."
+
+interactive_table <- function(table, 
+                              nrow = 5, 
+                              not_as_factor = c("mrn", 
+                                                "patient"
+                                                ),
+                              autoWidth = TRUE
+) {
+  # mutate(across(where(is.character) using forcats::as_factor, avoiding items in "not_as_factor"
+  table <- table |> 
+    mutate(across(where(is.character) 
+                  & !matches(not_as_factor), 
+                  forcats::as_factor))
+  
+  # configure table settings
+  dtable <- DT::datatable(table, 
+                          extensions = 'Buttons', 
+                          filter = "top",
+                          options = list(
+                            pageLength = nrow, #nrow dictates pageLength,
+                            #lengthMenu = c(5, 10, 15, 20),
+                            # initComplete = JS(
+                            #   "function(settings, json) {",
+                            #   "$(this.api().table().header()).css({'background-color': '#000', 'color': '#fff'});", #we use the initComplete callback function in options to change the background color of the table header to black after the initialization:
+                            #   "}"
+                            dom = 'Bfrtip', 
+                            buttons = c('copy',
+                                        'csv',
+                                        #'pdf',
+                                        'excel'
+                                        ),
+                            autoWidth = autoWidth,
+                            searchHighlight = TRUE)
+  )
+  
+  return(dtable)
+}
+
+
+```
+
+# Overview
+
+This report summarises themes identified from digital requests using locally-hosted LLM-generated metadata.
+
+The report is intended to support prioritisation and portfolio review by:
+
+* identifying common request themes
+* highlighting potentially related or duplicate requests
+* summarising requests by business area
+
+## Summary statistics
+
+```{r}
+summary_tbl <- tibble(
+  Metric = c(
+    "Requests analysed",
+    "Business areas",
+    "Themes"
+  ),
+  Value = c(
+    nrow(flat),
+    n_distinct(flat$business_area, na.rm = TRUE),
+    n_distinct(themes$themes, na.rm = TRUE)
+  )
+)
+
+summary_tbl |>
+  flextable() |>
+  theme_ft()
+```
+
+# Most common themes
+
+## Word cloud
+
+```{r}
+#| out-width: 100%
+#| fig-width: 16
+#| fig-height: 12
+
+theme_counts <- themes |>
+  count(themes, sort = TRUE) |>
+  #slice_head(n = 75) |> 
+  filter(n >= 2)
+
+theme_counts |>
+  slice_head(n = 75) |>
+  ggplot(
+    aes(
+      label = themes,
+      size = n,
+      colour = n
+    )
+  ) +
+  ggwordcloud::geom_text_wordcloud_area(
+    eccentricity = 0.5
+  ) +
+  scale_size_area(
+    max_size = 60
+  ) +
+  scale_colour_viridis_c() +
+  theme_void() +
+  theme(
+    legend.position = "none"
   )
 ```
 
-## Theme frequencies
+## Top 20 themes
 
 ```{r}
-themes <- flat |> select(request_row_id, themes) |> unnest(themes)
-themes |> count(themes, sort = TRUE) |> kable()
+theme_counts |>
+  slice_head(n = 20) |>
+  ggplot(
+    aes(
+      x = reorder(themes, n),
+      y = n
+    )
+  ) +
+  geom_col() +
+  coord_flip()
 ```
 
-## Potentially related or duplicate requests
 
-Requests sharing two or more themes.
+# Potentially related requests
+
+Requests that share multiple themes may represent:
+
+* similar problems
+* opportunities for collaboration
+* duplicate requests
+* opportunities to consolidate work
 
 ```{r}
-pairs <- inner_join(themes, themes, by = "themes", relationship = "many-to-many") |>
-  filter(request_row_id.x < request_row_id.y) |>
-  group_by(request_row_id.x, request_row_id.y) |>
-  summarise(shared_themes = paste(themes, collapse = "; "), n = n(), .groups = "drop") |>
-  filter(n >= 2) |> arrange(desc(n))
-kable(pairs)
+pairs <- inner_join(
+  themes,
+  themes,
+  by = "themes",
+  relationship = "many-to-many"
+) |>
+  filter(
+    digital_request_number.x < digital_request_number.y
+  ) |>
+  group_by(
+    digital_request_number.x,
+    digital_request_number.y
+  ) |>
+  summarise(
+    shared_themes = paste(
+      sort(unique(themes)),
+      collapse = "; "
+    ),
+    n_shared_themes = n(),
+    .groups = "drop"
+  ) |>
+  filter(n_shared_themes >= 2) |>
+  arrange(
+    desc(n_shared_themes),
+    digital_request_number.x,
+    digital_request_number.y
+  )
+
+pairs |>
+    interactive_table(nrow = 5, 
+                                      not_as_factor = c("mrn", 
+                                                        "patient"
+                                                        ),
+                                ) 
 ```
 
-## Request summaries
+# Request summaries
 
 ```{r}
 flat |>
-  transmute(request_row_id, business_area, themes = map_chr(themes, paste, collapse = "; "), summary) |>
-  kable()
+  transmute(
+    digital_request_number,
+    business_area,
+    themes = map_chr(
+      themes,
+      paste,
+      collapse = "; "
+    ),
+    summary = str_trunc(
+      summary,
+      width = 1000
+    )
+  ) |>
+  arrange(
+    business_area,
+    digital_request_number
+  ) |>
+  interactive_table(nrow = 5, 
+                                      not_as_factor = c("themes", 
+                                                        "summary"
+                                                        ),
+                                ) 
 ```
 
-## Quality assurance findings
+# Appendix
+
+## Heatmap: Themes x Business area
 
 ```{r}
-flat |>
-  transmute(request_row_id,
-            findings_v2 = map_chr(findings_v2, paste, collapse = " | "),
-            findings_v3 = map_chr(findings_v3, paste, collapse = " | ")) |>
-  filter(findings_v2 != "" | findings_v3 != "") |>
-  kable()
+theme_business <- themes |>
+  count(
+    business_area,
+    themes
+  )
+
+ggplot(
+  theme_business,
+  aes(
+    x = themes,
+    y = business_area,
+    fill = n
+  )
+) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  )
 ```
+
+<!-- ## Business area frequencies -->
+
+<!-- ```{r} -->
+<!-- flat |> -->
+<!--   count( -->
+<!--     business_area, -->
+<!--     sort = TRUE -->
+<!--   ) |> -->
+<!--   rename( -->
+<!--     Requests = n -->
+<!--   ) |> -->
+<!--   flextable() |> -->
+<!--   theme_ft() -->
+<!-- ``` -->
+
+
+
+
+
