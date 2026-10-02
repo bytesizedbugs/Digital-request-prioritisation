@@ -61,68 +61,14 @@ themes_clean <- themes |>
     themes = str_to_title(themes)
   )
 
-# Create groupings
-theme_group = case_when(
-
-  str_detect(themes, regex("AI|Artificial Intelligence")) ~
-    "AI",
-
-  str_detect(themes, regex(
-    "Radiology|Imaging|PACS|RIS|Ultrasound|MRI",
-    TRUE
-  )) ~
-    "Radiology & Imaging",
-
-  str_detect(themes, regex(
-    "Laboratory|LIMS|LIS|GLIMS|Pathology|Genetics",
-    TRUE
-  )) ~
-    "Laboratory Systems",
-
-  str_detect(themes, regex(
-    "Pharmacy|Medication|Prescribing|Drug",
-    TRUE
-  )) ~
-    "Pharmacy",
-
-  str_detect(themes, regex(
-    "Data|Database|Reporting|Dashboard|Governance",
-    TRUE
-  )) ~
-    "Data & Information",
-
-  str_detect(themes, regex(
-    "Integration|Interoperability|Interface|SSO",
-    TRUE
-  )) ~
-    "Integration",
-
-  str_detect(themes, regex(
-    "Migration|Replacement|Upgrade|Modernisation|Modernization",
-    TRUE
-  )) ~
-    "System Change",
-
-  str_detect(themes, regex(
-    "Workflow|Process|Automation|Efficiency",
-    TRUE
-  )) ~
-    "Workflow",
-
-  str_detect(themes, regex(
-    "Infrastructure|Hosting|Cloud|VM|Network|Hardware",
-    TRUE
-  )) ~
-    "Infrastructure",
-
-  str_detect(themes, regex(
-    "Patient|Outpatient|Referral|Care Pathway",
-    TRUE
-  )) ~
-    "Patient Pathways",
-
-  TRUE ~ "Other"
-)
+# create flat metadata table for later use in report
+flat_metadata <- res |>
+    select(
+        request_row_id,
+        digital_request_number,
+        metadata_v3
+    ) |>
+    unnest_wider(metadata_v3)
 
 # Flextable ---------------
 
@@ -261,6 +207,7 @@ theme_counts |>
   coord_flip()
 ```
 
+
 # Potentially related requests
 
 Requests that share multiple themes may represent:
@@ -337,19 +284,49 @@ flat |>
 
 # Appendix
 
-## Business area frequencies
+## Heatmap: Themes x Business area
 
 ```{r}
-flat |>
+theme_business <- themes |>
   count(
     business_area,
-    sort = TRUE
-  ) |>
-  rename(
-    Requests = n
-  ) |>
-  flextable() |>
-  theme_ft()
+    themes
+  )
+
+ggplot(
+  theme_business,
+  aes(
+    x = themes,
+    y = business_area,
+    fill = n
+  )
+) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,
+      hjust = 1
+    )
+  )
 ```
+
+<!-- ## Business area frequencies -->
+
+<!-- ```{r} -->
+<!-- flat |> -->
+<!--   count( -->
+<!--     business_area, -->
+<!--     sort = TRUE -->
+<!--   ) |> -->
+<!--   rename( -->
+<!--     Requests = n -->
+<!--   ) |> -->
+<!--   flextable() |> -->
+<!--   theme_ft() -->
+<!-- ``` -->
+
+
+
 
 
