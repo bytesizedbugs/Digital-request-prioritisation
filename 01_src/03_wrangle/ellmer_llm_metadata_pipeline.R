@@ -19,7 +19,7 @@ model_name <- "gemma4"
 max_retries <- 3
 base_url <- Sys.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 output_file <- here::here("02_data_output", "dig_req_llm_metadata_2.rds")
-n_requests <- 3 # number of requests to process while testing; use Inf for all
+n_requests <- 4 # number of requests to process while testing; use Inf for all
 
 # Output schema, enforced by Ollama via structured output (so no JSON parsing is needed).
 # Field guidance lives in the prompt file.
@@ -33,8 +33,7 @@ metadata_type <- ellmer::type_object(
   expected_benefits = str_list(NULL),
   dependencies = str_list(NULL),
   risks_or_constraints = str_list(NULL),
-  priority_indicators = str_list(NULL),
-  themes = str_list("1-5 short thematic labels")
+  themes = str_list("1-4 themes selected exactly from the controlled vocabulary")
 )
 system_prompt <- paste(
   readLines(here::here("01_src", "03_wrangle", "Prompts", "prompt-digital-request-analysis.md")),
